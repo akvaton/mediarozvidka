@@ -3,5 +3,8 @@
 
 
 """
+import sys
+sys.path[0:0] = ['../news_pro']
+
 import django
 django.setup()
