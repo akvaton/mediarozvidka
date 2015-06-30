@@ -1,4 +1,3 @@
-
 from scrapy import Spider
 from scrapy.selector import Selector
 from app_news.models import NewsItem

@@ -1,5 +1,16 @@
+#! /usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+    news_pro.app_news.models
+    ~~~~~~~~~
+
+    :copyright: (c) 2015 by dorosh.
+"""
+
+__author__ = 'dorosh'
+__date__ = '11.06.2015'
+
 from django.db import models
-from scrapy.contrib.djangoitem import DjangoItem
 
 
 class NewsModel(models.Model):
@@ -12,12 +23,48 @@ class NewsModel(models.Model):
 
 
 class ArticleModel(models.Model):
-    # define the fields for your item here like:
+    '''
+    Model for agregate article from news source.
+    '''
     title =  models.CharField(max_length=160, blank=True, null=True)
     link = models.URLField(max_length=160, blank=True, null=True)
-    datetime = models.DateTimeField()
-    shares = models.PositiveIntegerField()
-    comments = models.PositiveIntegerField()
+    datetime = models.DateTimeField(auto_now_add=True)
+    comments = models.PositiveIntegerField(
+        u'Коментованість новини', default=0
+    )
+    shares_fb_total = models.PositiveIntegerField(
+        u'Поширюваність новини', default=0
+    )
 
     def __unicode__(self):
         return self.title
+
+
+class StatisticArticle(models.Model):
+    '''
+    Model for agregate statistics from article
+    '''
+    article = models.ForeignKey(
+        ArticleModel, verbose_name=u'Новина'
+    )
+    order = models.PositiveIntegerField(
+        u'Час який минув від моменту появи новини'
+    )
+    site_order = models.PositiveIntegerField(
+        u'Положення новини на сайті', blank=True, null=True
+    )
+    attendance = models.PositiveIntegerField(
+        u'Відвідуваність новини', blank=True, null=True
+    )
+    attendance_index_site = models.PositiveIntegerField(
+        u'Відвідуваність головної сторінки', blank=True, null=True
+    )
+    shares_fb = models.PositiveIntegerField(
+        u'Поширюваність новини'
+    )
+    comments = models.PositiveIntegerField(
+        u'Коментованість новини'
+    )
+
+    def __unicode__(self):
+        return self.article.title

@@ -16,7 +16,7 @@ import time
 import json
 import datetime
 
-from an.items import ArticleItem
+from an.items import ArticleItem, StatisticArticleItem
 from cookie import get_cookie
 
 class UkrPravdaSpider(scrapy.Spider):
@@ -33,25 +33,24 @@ class UkrPravdaSpider(scrapy.Spider):
         assert page.ok
         # create new resposne with new text for xpathing
         res = scrapy.http.HtmlResponse(url='http://pravda.com.ua/articles', body=page.text, encoding='utf8')
-
         all_links = res.xpath(".//div[@class='summary sec']/h4/a/@href").extract()
         all_names = res.xpath(".//div[@class='summary sec']/h4/a/text()").extract()
 
+        print all_links, all_names, '!!!!!!!!!!!!!!!!!!'
         filtered_links = [(all_links.index(link), link) for link in all_links if "http" not in link]
         # import ipdb; ipdb.set_trace()
         filtered_names_and_links = [(all_names[i[0]], i[1]) for i in filtered_links]
         # other_links = [link for link in all_links if "http" in link]
-
         for name, link in filtered_names_and_links:
             full_url = response.url + link
-            item = ArticleItem()
+            item, state_item = ArticleItem(), StatisticArticleItem()
+            state_item['order'] = int(time.time())
             item['title'] = name
             item['link'] = full_url
-            item['datetime'] = datetime.datetime.now() # int(time.time())
             item['comments'] = 0
-            item['shares'] = json.loads(
+            item['shares_fb'] = json.loads(
                 requests.get(
-                    """https://graph.facebook.com/fql?q=select%20%20share_count%20from%20link_stat%20where%20url=%22{}%22""".format(full_url)
-            ).text)['data'][0]['share_count']
-            yield item
-
+                    "https://graph.facebook.com/fql?q=select%20%20share_count%20from%20link_stat%20where%20url=%22{}%22".format(full_url)
+                ).text
+            )['data'][0]['share_count']
+            yield item, state_item
