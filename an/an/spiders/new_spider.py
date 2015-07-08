@@ -43,14 +43,13 @@ class UkrPravdaSpider(scrapy.Spider):
         # other_links = [link for link in all_links if "http" in link]
         for name, link in filtered_names_and_links:
             full_url = response.url + link
-            item, state_item = ArticleItem(), StatisticArticleItem()
-            state_item['order'] = int(time.time())
+            item = ArticleItem()
             item['title'] = name
             item['link'] = full_url
             item['comments'] = 0
-            item['shares_fb'] = json.loads(
+            item['shares_fb_total'] = json.loads(
                 requests.get(
                     "https://graph.facebook.com/fql?q=select%20%20share_count%20from%20link_stat%20where%20url=%22{}%22".format(full_url)
                 ).text
             )['data'][0]['share_count']
-            yield item, state_item
+            yield item

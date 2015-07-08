@@ -7,13 +7,13 @@
     :copyright: (c) 2015 by dorosh.
 """
 
+import time
 from app_news.models import NewsModel, ArticleModel, StatisticArticle
 
 
 class AnPipeline(object):
 
     def process_item(self, item, spider):
-        item, state_item = item
         try:
             item_saved, cr = ArticleModel.objects.get_or_create(
                 link=item['link'], defaults=item
@@ -28,26 +28,29 @@ class AnPipeline(object):
         if cr:
             StatisticArticle.objects.create(
                 article=item_saved,
-                order=state_item['order'],
+                order=int(time.time()),
                 site_order = 0,
                 attendance = 0,
                 attendance_index_site = 0,
-                shares_fb = item['shares_fb'],
+                shares_fb = item['shares_fb_total'],
                 comments = item['comments']
             )
             return item
 
+        shares_fb = 0
+        comments = 0
+
         if item['comments'] > item_saved.comments or \
-                item['shares_fb'] > item_saved.shares_fb:
+                item['shares_fb_total'] > item_saved.shares_fb_total:
             comments = item['comments'] - item_saved.comments
-            shares_fb = item['shares_fb'] - item_saved.shares_fb
+            shares_fb = item['shares_fb_total'] - item_saved.shares_fb_total
             item_saved.comments = item['comments']
-            item_saved.shares_fb = item['shares_fb']
+            item_saved.shares_fb_total = item['shares_fb_total']
             item_saved.save()
 
         StatisticArticle.objects.create(
             article=item_saved,
-            order=state_item['order'],
+            order=int(time.time()),
             site_order = 0,
             attendance = 0,
             attendance_index_site = 0,
