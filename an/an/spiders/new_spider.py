@@ -49,7 +49,7 @@ class UkrPravdaSpider(scrapy.Spider):
             item['comments'] = 0
             item['shares_fb_total'] = json.loads(
                 requests.get(
-                    "https://graph.facebook.com/fql?q=select%20%20share_count%20from%20link_stat%20where%20url=%22{}%22".format(full_url)
+                    "http://graph.facebook.com/?id={}".format(full_url)
                 ).text
-            )['data'][0]['share_count']
+            )['shares']
             yield item
