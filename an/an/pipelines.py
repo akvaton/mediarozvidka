@@ -28,7 +28,7 @@ class AnPipeline(object):
         if cr:
             StatisticArticle.objects.create(
                 article=item_saved,
-                order=int(time.time()),
+                order=int(time.time()-time.mktime(item_saved.datetime.timetuple())),
                 site_order = 0,
                 attendance = 0,
                 attendance_index_site = 0,
@@ -50,7 +50,7 @@ class AnPipeline(object):
 
         StatisticArticle.objects.create(
             article=item_saved,
-            order=int(time.time()),
+            order=int(time.time()-time.mktime(item_saved.datetime.timetuple())),
             site_order = 0,
             attendance = 0,
             attendance_index_site = 0,

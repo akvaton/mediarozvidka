@@ -28,19 +28,16 @@ class UkrPravdaSpider(scrapy.Spider):
 
     def parse(self, response):
         cookie = get_cookie()
-        print cookie
         page = requests.get('http://pravda.com.ua/articles', cookies=cookie)
         assert page.ok
         # create new resposne with new text for xpathing
         res = scrapy.http.HtmlResponse(url='http://pravda.com.ua/articles', body=page.text, encoding='utf8')
         all_links = res.xpath(".//div[@class='summary sec']/h4/a/@href").extract()
         all_names = res.xpath(".//div[@class='summary sec']/h4/a/text()").extract()
-
-        print all_links, all_names, '!!!!!!!!!!!!!!!!!!'
         filtered_links = [(all_links.index(link), link) for link in all_links if "http" not in link]
-        # import ipdb; ipdb.set_trace()
         filtered_names_and_links = [(all_names[i[0]], i[1]) for i in filtered_links]
         # other_links = [link for link in all_links if "http" in link]
+
         for name, link in filtered_names_and_links:
             full_url = response.url + link
             item = ArticleItem()
