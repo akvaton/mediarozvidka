@@ -10,14 +10,14 @@ title = res.xpath(".//div[@class='fblock']/div[@class='topblock2']/div/div/div[@
 scrapy crawl up -o items.json
 """
 
-import scrapy
-import requests
-import time
 import json
-import datetime
+import re
+import requests
+import scrapy
 
 from an.items import ArticleItem, StatisticArticleItem
 from cookie import get_cookie
+
 
 class UkrPravdaSpider(scrapy.Spider):
     name = "up"
@@ -49,4 +49,11 @@ class UkrPravdaSpider(scrapy.Spider):
                     "http://graph.facebook.com/?id={}".format(full_url)
                 ).text
             )['shares']
+            item['shares_vk_total'] = self.get_shares_vk_total(full_url)
             yield item
+
+    def get_shares_vk_total(self, full_url):
+        re_mask = '^VK.Share.count\([\d+], (\d+)\);$'
+        rq_text = requests.get("http://vk.com/share.php?act=count&url={}".format(full_url)).text
+        match = re.match(re_mask, rq_text)
+        return int(match.groups()[0]) if match else 0
