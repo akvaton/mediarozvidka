@@ -37,16 +37,14 @@ class AnPipeline(object):
             )
             return item
 
-        shares_fb = 0
-        comments = 0
+        comments = item['comments'] - item_saved.comments
+        shares_fb = item['shares_fb_total'] - item_saved.shares_fb_total
+        shares_vk = item['shares_vk_total'] - item_saved.shares_vk_total
 
-        if item['comments'] > item_saved.comments or \
-                item['shares_fb_total'] > item_saved.shares_fb_total:
-            comments = item['comments'] - item_saved.comments
-            shares_fb = item['shares_fb_total'] - item_saved.shares_fb_total
-            item_saved.comments = item['comments']
-            item_saved.shares_fb_total = item['shares_fb_total']
-            item_saved.save()
+        item_saved.comments = item['comments']
+        item_saved.shares_fb_total = item['shares_fb_total']
+        item_saved.shares_vk_total = item['shares_vk_total']
+        item_saved.save()
 
         StatisticArticle.objects.create(
             article=item_saved,
@@ -55,6 +53,7 @@ class AnPipeline(object):
             attendance = 0,
             attendance_index_site = 0,
             shares_fb = shares_fb,
+            shares_vk = shares_vk,
             comments = comments
         )
 

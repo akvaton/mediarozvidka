@@ -33,7 +33,10 @@ class ArticleModel(models.Model):
         u'Коментованість новини', default=0
     )
     shares_fb_total = models.PositiveIntegerField(
-        u'Поширюваність новини', default=0
+        u"Поширюваність новини у FB ", default=0
+    )
+    shares_vk_total = models.PositiveIntegerField(
+        u'Поширюваність новини у VK', default=0
     )
 
     def __unicode__(self):
@@ -60,7 +63,10 @@ class StatisticArticle(models.Model):
         u'Відвідуваність головної сторінки', blank=True, null=True
     )
     shares_fb = models.PositiveIntegerField(
-        u'Поширюваність новини'
+        u'Поширюваність новини у цей час у FB'
+    )
+    shares_vk = models.PositiveIntegerField(
+        u'Поширюваність новини у цей час у VK', default=0
     )
     comments = models.PositiveIntegerField(
         u'Коментованість новини'
