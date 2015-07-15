@@ -33,6 +33,7 @@ class AnPipeline(object):
                 attendance = 0,
                 attendance_index_site = 0,
                 shares_fb = item['shares_fb_total'],
+                shares_vk = item['shares_vk_total'],
                 comments = item['comments']
             )
             return item
