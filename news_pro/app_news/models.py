@@ -4,33 +4,29 @@
     news_pro.app_news.models
     ~~~~~~~~~
 
-    :copyright: (c) 2015 by dorosh.
+    :copyright: (c) 2015 by vZ.
 """
 
-__author__ = 'dorosh'
-__date__ = '11.06.2015'
+__author__ = 'vZ'
+__date__ = '21.11.2015'
 
 from django.db import models
-
-
-class NewsModel(models.Model):
-    title = models.CharField(max_length=30, blank=True, null=True)
-    content = models.TextField(blank=True, null=True)
-    link = models.URLField(max_length=40, blank=True, null=True)
-
-    def __unicode__(self):
-        return self.title
 
 
 class ArticleModel(models.Model):
     '''
     Model for agregate article from news source.
     '''
+    SOURCE_TYPE_OPTIONS = (('1', 'pravda.com.ua'),
+                           ('2', 'blog'))
+
     title =  models.CharField(max_length=160, blank=True, null=True)
     link = models.URLField(max_length=160, blank=True, null=True)
     datetime = models.DateTimeField(auto_now_add=True)
-    comments = models.PositiveIntegerField(
-        u'Коментованість новини', default=0
+    internet_time = models.TimeField(blank=True)
+    source = models.IntegerField(choices=SOURCE_TYPE_OPTIONS)
+    attendance = models.PositiveIntegerField(
+        u'Відвідуваність новини', blank=True, null=True
     )
     shares_fb_total = models.PositiveIntegerField(
         u"Поширюваність новини у FB ", default=0
@@ -40,7 +36,7 @@ class ArticleModel(models.Model):
     )
 
     def __unicode__(self):
-        return self.title
+        return self.title or u''
 
 
 class StatisticArticle(models.Model):
@@ -53,24 +49,16 @@ class StatisticArticle(models.Model):
     order = models.PositiveIntegerField(
         u'Час який минув від моменту появи новини'
     )
-    site_order = models.PositiveIntegerField(
-        u'Положення новини на сайті', blank=True, null=True
-    )
     attendance = models.PositiveIntegerField(
         u'Відвідуваність новини', blank=True, null=True
     )
-    attendance_index_site = models.PositiveIntegerField(
-        u'Відвідуваність головної сторінки', blank=True, null=True
-    )
     shares_fb = models.PositiveIntegerField(
-        u'Поширюваність новини у цей час у FB'
+        u'Поширюваність новини у цей час у FB', default=0
     )
     shares_vk = models.PositiveIntegerField(
         u'Поширюваність новини у цей час у VK', default=0
     )
-    comments = models.PositiveIntegerField(
-        u'Коментованість новини'
-    )
+
 
     def __unicode__(self):
         return self.article.title

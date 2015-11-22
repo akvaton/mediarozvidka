@@ -10,4 +10,5 @@ class ExampleSpider(scrapy.Spider):
     )
 
     def parse(self, response):
+        print 'sadfasdfasf'
         pass

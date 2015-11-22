@@ -335,7 +335,7 @@ document.cookie="PRAVDA_COOKIE="+toHex(slowAES.decrypt(c,2,a,b))+"; expires=Thu,
 
 def get_cookie():
     js_code = aes_js + '\n' + additional_js + '\n' + """return document.cookie;""" + '\n' + """};"""
-    # print js_code;
+    #print js_code;
     ctx = execjs.compile(js_code)
     elements = ctx.call("get_cookie_js").split('=', 1)
     return {elements[0]: elements[1]}

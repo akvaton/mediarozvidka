@@ -32,12 +32,11 @@ class UkrPravdaSpider(scrapy.Spider):
         assert page.ok
         # create new resposne with new text for xpathing
         res = scrapy.http.HtmlResponse(url='http://pravda.com.ua/articles', body=page.text, encoding='utf8')
-        all_links = res.xpath(".//div[@class='summary sec']/h4/a/@href").extract()
-        all_names = res.xpath(".//div[@class='summary sec']/h4/a/text()").extract()
+        all_links = res.selector.xpath(".//div[@class='summary sec']/h4/a/@href").extract()
+        all_names = res.selector.xpath(".//div[@class='summary sec']/h4/a/text()").extract()
         filtered_links = [(all_links.index(link), link) for link in all_links if "http" not in link]
         filtered_names_and_links = [(all_names[i[0]], i[1]) for i in filtered_links]
         # other_links = [link for link in all_links if "http" in link]
-
         for name, link in filtered_names_and_links:
             full_url = response.url + link
             item = ArticleItem()
@@ -49,11 +48,15 @@ class UkrPravdaSpider(scrapy.Spider):
             yield item
 
     def get_shares_fb_total(self, full_url):
-        return json.loads(requests.get("http://graph.facebook.com/?id={}".format(full_url)).text)['shares']
+        return json.loads(requests.get(
+            "http://graph.facebook.com/?id={}".format(full_url)).text
+                          )['shares']
 
     def get_shares_vk_total(self, full_url):
         re_mask = '^VK.Share.count\([\d+], (\d+)\);$'
-        rq_text = requests.get("http://vk.com/share.php?act=count&url={}".format(full_url)).text
+        rq_text = requests.get(
+            "http://vk.com/share.php?act=count&url={}".format(full_url)
+            ).text
         match = re.match(re_mask, rq_text)
         return int(match.groups()[0]) if match else 0
 

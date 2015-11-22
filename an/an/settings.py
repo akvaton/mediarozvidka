@@ -19,4 +19,4 @@ ITEM_PIPELINES = {
     'an.pipelines.AnPipeline': 1000,
 }
 
-STATS_ENABLED = True
+#STATS_ENABLED = True

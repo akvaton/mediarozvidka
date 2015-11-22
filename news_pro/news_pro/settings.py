@@ -8,17 +8,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-import djcelery
-djcelery.setup_loader()
+# import djcelery
+# djcelery.setup_loader()
 
 # from  __future__ import absolute_import
 
 # CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
 
-CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
-CELERY_ALWAYS_EAGER = False
-
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+# CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
+# CELERY_ALWAYS_EAGER = False
+#
+# CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 
 BROKER_URL = 'django://'
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -91,6 +91,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
+print STATICFILES_DIRS
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
