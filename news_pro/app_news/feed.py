@@ -32,9 +32,12 @@ class FixedOffset(tzinfo):
 
 
 def get_shares_fb_total(full_url):
-    return json.loads(requests.get(
-        "http://graph.facebook.com/?id={}".format(full_url)).text
-                      )['shares']
+    try:
+        return json.loads(requests.get(
+            "http://graph.facebook.com/?id={}".format(full_url)).text
+                          )['shares']
+    except KeyError:
+        return 0
 
 def get_shares_vk_total(full_url):
     re_mask = '^VK.Share.count\([\d+], (\d+)\);$'

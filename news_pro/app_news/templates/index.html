@@ -10,18 +10,46 @@
     <title>News App</title>
 </head>
 <body>
-    <div class="row container vertical-center-row">
-        <div class="col-md-2 col-md-offset-1">
-            <a class="btn btn-block btn-success " href="#">Get news</a>
+    <div class="row container-fluid">
+        <div class="col-md-3">
+            {% if last_news %}
+            <table class="table">
+                <thead>
+                    <th>Article title</th>
+                </thead>
+            {% for each in last_news %}
+                <tr height="60px">
+                    <td>{{ each.title }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+            {% endif %}
+            <a class="btn btn-block btn-success " href="{% url 'news:get_new' %}">Get news</a>
         </div>
-        <div class="col-md-2 col-md-offset-1">
-            <a class="btn btn-block btn-success" href="#">Get shares</a>
+        <div class="col-md-3">
+            {% if last_news %}
+            <table class="table">
+                <thead>
+                    <th>FB shares</th>
+                    <th>VK shares</th>
+                    <th>Attendances</th>
+                </thead>
+            {% for each in last_news %}
+                <tr height="60px">
+                     <td> {{ each.shares_fb_total}}</td>
+                     <td> {{ each.shares_vk_total}}</td>
+                     <td> {{ each.attendance }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+            {% endif %}
+            <a class="btn btn-block btn-success" href="{% url 'news:get_shares' %}">Get shares</a>
         </div>
-        <div class="col-md-2 col-md-offset-1">
+        <div class="col-md-3">
             <a class="btn btn-block btn-success" href="#">News list</a>
         </div>
-        <div class="col-md-2 col-md-offset-1">
-            <a class="btn btn-block btn-success" href="#">Get internet time</a>
+        <div class="col-md-3">
+            <a class="btn btn-block btn-success" href="#">Internet time</a>
         </div>
     </div>
 </body>
