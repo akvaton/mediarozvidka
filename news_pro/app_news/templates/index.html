@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="row container-fluid">
-        <div class="col-md-3">
+        <div class="col-md-3 col-md-offset-2">
             {% if last_news %}
             <table class="table">
                 <thead>
@@ -44,9 +44,6 @@
             </table>
             {% endif %}
             <a class="btn btn-block btn-success" href="{% url 'news:get_shares' %}">Get shares</a>
-        </div>
-        <div class="col-md-3">
-            <a class="btn btn-block btn-success" href="#">News list</a>
         </div>
         <div class="col-md-3">
             <a class="btn btn-block btn-success" href="#">Internet time</a>
