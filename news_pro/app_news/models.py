@@ -13,6 +13,8 @@ __date__ = '21.11.2015'
 from BeautifulSoup import BeautifulSoup
 import urllib2
 from datetime import datetime
+from pytz import timezone
+
 
 from django.db import models
 from django.db.models import Sum
@@ -44,9 +46,11 @@ class InternetTime(models.Model):
         all_visits = InternetTime.objects.filter(date__lt=datetime.today()).\
                      aggregate(Sum('visits'))['visits__sum'] or .0
         today_visits = get_today_visits()
-        a = InternetTime.objects.get_or_create(date=datetime.today())[0]
-        a.visits = today_visits/cls.minute
-        a.save()
+        stored_visits = InternetTime.objects.get_or_create(
+                                date=datetime.now(timezone('Europe/Moscow'))
+                                                            )[0]
+        stored_visits.visits = today_visits/cls.minute
+        stored_visits.save()
         return all_visits + float(today_visits)/cls.minute
 
     def __unicode__(self):
