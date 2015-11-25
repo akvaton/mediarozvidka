@@ -16,7 +16,7 @@ from django.contrib import admin
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
 
-from .models import ArticleModel, StatisticArticle
+from .models import ArticleModel, StatisticArticle, InternetTime
 
 
 
@@ -29,6 +29,11 @@ class ArticleResource(resources.ModelResource):
 @admin.register(ArticleModel)
 class ArticleModelAdmin(ImportExportModelAdmin):
     resource_class = ArticleResource
+
+
+@admin.register(InternetTime)
+class ArticleModelAdmin(ImportExportModelAdmin):
+    resource_class = InternetTime
 
 
 class StatisticArticleResource(resources.ModelResource):

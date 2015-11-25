@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block container %}
+<div class="row container">
+
+    <div class="col-md-offset-2">
+   <h2>  <a href="{% url 'news:all' %}" class="btn btn-success">Back</a> <hr> {{ articlemodel.title }} </h2>
+    <table class="table">
+        <thead>
+            <th>Час запросу</th>
+            <th>Shares FB</th>
+            <th>Shares VK</th>
+            <th>Attendance</th>
+            <th>Internet час</th>
+        </thead>
+        <tbody>
+            {% for share in shares %}
+            <tr>
+                <td>{{ share.datetime }}</td>
+                <td>{{ share.shares_fb}}</td>
+                <td>{{ share.shares_vk}}</td>
+                <td>{{ share.attendance}}</td>
+                <td>{{ share.internet_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock container %}

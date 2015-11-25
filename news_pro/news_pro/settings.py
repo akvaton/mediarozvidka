@@ -20,7 +20,12 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 #
 # CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 
-BROKER_URL = 'django://'
+
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERYD_MAX_TASKS_PER_CHILD = 10
+CELERY_CREATE_MISSING_QUEUES = True
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))

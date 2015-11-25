@@ -6,11 +6,10 @@ import urllib2
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime, timedelta, tzinfo
 
-from  models import ArticleModel, StatisticArticle
-
-
+from  models import ArticleModel, StatisticArticle, InternetTime
 
 pravda_url = 'http://www.pravda.com.ua/rss/view_news/'
+
 
 class FixedOffset(tzinfo):
     """Fixed offset in minutes: `time = utc_time + utc_offset`."""
@@ -39,6 +38,7 @@ def get_shares_fb_total(full_url):
     except KeyError:
         return 0
 
+
 def get_shares_vk_total(full_url):
     re_mask = '^VK.Share.count\([\d+], (\d+)\);$'
     rq_text = requests.get(
@@ -49,22 +49,26 @@ def get_shares_vk_total(full_url):
 
 
 def get_attendances(full_url):
-    for num in range(1,20):
-        page = urllib2.urlopen(
-            'http://www.liveinternet.ru/stat/ukrpravda/pages.html?page=%s' % num
-                              ).read()
-        soup = BeautifulSoup(page)
-        soup.prettify()
-        print full_url
-        for each in soup.findAll('a', href=True):
-            if each.get('href')==full_url:
-                b = each.parent
-                print b.next_sibling
-                return b
-    return 1
+    for num in range(1,3):
+        try:
+            page = urllib2.urlopen(
+                'http://www.liveinternet.ru/stat/ukrpravda/pages.html?page=%s&per_page=200' % num
+                                  ).read()
+            soup = BeautifulSoup(page)
+            soup.prettify()
+            for each in soup.findAll('a', href=True):
+                if full_url[11:] in each.get('href'):
+                    td_tag = each.parent
+                    next_td_tag = td_tag.findNext('td')
+                    return int(next_td_tag.contents[0].replace(',', ''))
+        except Exception as e:
+            print e
+    return 0
+
 
 def get_new_articles():
     rssfeed = feedparser.parse(pravda_url)
+    internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
         if 'pravda.com.ua' in each['link']:
             (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
@@ -78,25 +82,25 @@ def get_new_articles():
                 article.title = each['title']
                 article.datetime = dt
                 article.source = 1
-                article.internet_time = datetime.now()
+                article.internet_time = internet_time
                 article.save()
-                print article
             else:
                 break
 
 
 def check_articles_shares():
     now_minus_48 = datetime.today()-timedelta(hours=48)
-    print now_minus_48
-    active_articles = ArticleModel.objects.filter(datetime__gte = now_minus_48)
+    internet_time = InternetTime.get_internet_time()
+    active_articles = ArticleModel.objects.filter(datetime__gte = now_minus_48).\
+        order_by('datetime')
     for each in active_articles:
+        print 'Get shares for %s' % each.title
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
         attendance = get_attendances(each.link)
-        print attendance
         stat = StatisticArticle(article=each,
-                                order=1,
                                 shares_fb=shares_fb,
+                                internet_time=internet_time - float(each.internet_time),
                                 shares_vk=shares_vk,
                                 attendance = attendance)
         stat.save()

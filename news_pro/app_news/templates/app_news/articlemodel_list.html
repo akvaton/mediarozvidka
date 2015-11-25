@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block container %}
+    <div class="row container">
+        <div class="col-md-offset-3 col-md-10">
+            <table class="table">
+                <thead>
+                    <th>Стаття</th>
+                    <th>Час публікації</th>
+                    <th>Істочник</th>
+                    <th>Internet час</th>
+                </thead>
+            {% for article in object_list%}
+                <tr>
+                    <td><a href="{% url 'news:news' pk=article.id %}">
+                        {{ article.title }}</a>
+                    </td>
+                    <td>{{ article.datetime|date }}</td>
+                    <td>{{ article.source_name }}</td>
+                    <td>{{ article.internet_time}}</td>
+                </tr>
+            {% empty %}
+                <li>No articles yet.</li>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock container %}
