@@ -49,7 +49,7 @@ def get_shares_vk_total(full_url):
 
 
 def get_attendances(full_url):
-    for num in range(1,3):
+    for num in range(1,10):
         try:
             page = urllib2.urlopen(
                 'http://www.liveinternet.ru/stat/ukrpravda/pages.html?page=%s&per_page=200' % num
