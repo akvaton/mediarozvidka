@@ -40,8 +40,13 @@ from feed import get_new_articles, check_articles_shares
 # reactor.run()
 
 
-class GetNewsAndShares(Task):
+class GetShares(Task):
+
+    def run(self, *args, **kwargs):
+        check_articles_shares()
+
+
+class GetNews(Task):
 
     def run(self, *args, **kwargs):
         get_new_articles()
-        check_articles_shares()

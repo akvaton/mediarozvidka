@@ -18,8 +18,12 @@ app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.CELERYBEAT_SCHEDULE = {
-    'get_new_articles_and_shares': {
-        'task': 'app_news.tasks.GetNewsAndShares',
+    'get_new_shares': {
+        'task': 'app_news.tasks.GetShares',
         'schedule': crontab(minute='*/15')
+    },
+    'get_new_articles': {
+        'task': 'app_news.tasks.GetNews',
+        'schedule': crontab(minute='*/1')
     }
 }
