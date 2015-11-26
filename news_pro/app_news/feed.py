@@ -100,7 +100,7 @@ def check_articles_shares():
     active_articles = ArticleModel.objects.filter(datetime__gte = now_minus_48).\
         order_by('datetime')
     for each in active_articles:
-        print 'Get shares for %s' % each.title
+        #print 'Get shares for %s' % each.title
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
         attendance = get_attendances(each.link)
