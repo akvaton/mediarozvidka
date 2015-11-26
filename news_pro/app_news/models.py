@@ -38,7 +38,7 @@ class InternetTime(models.Model):
 
     minute = 100000.0
 
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField()
     visits = models.FloatField(null=True)
 
     @classmethod
@@ -46,11 +46,15 @@ class InternetTime(models.Model):
         all_visits = InternetTime.objects.filter(date__lt=datetime.today()).\
                      aggregate(Sum('visits'))['visits__sum'] or .0
         today_visits = get_today_visits()
-        stored_visits = InternetTime.objects.get_or_create(
-                                date=datetime.now(timezone('Europe/Moscow'))
-                                                            )[0]
+        (stored_visits, cr) = InternetTime.objects.get_or_create(
+                        date=datetime.now(timezone('Europe/Moscow')).date())
         stored_visits.visits = today_visits/cls.minute
+        if cr:
+            stored_visits.date = datetime.now(timezone('Europe/Moscow'))
         stored_visits.save()
+        print "Moscow time ",datetime.now(timezone('Europe/Moscow'))
+        print "Date now ", datetime.now()
+        print "Today visits ", today_visits
         return all_visits + float(today_visits)/cls.minute
 
     def __unicode__(self):

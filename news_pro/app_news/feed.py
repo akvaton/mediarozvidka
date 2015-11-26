@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, tzinfo
 
 from  models import ArticleModel, StatisticArticle, InternetTime
 
-pravda_url = 'http://www.pravda.com.ua/rss/view_news/'
+pravda_url = 'http://www.pravda.com.ua/rss/view_pubs/'
 
 
 class FixedOffset(tzinfo):
@@ -49,20 +49,24 @@ def get_shares_vk_total(full_url):
 
 
 def get_attendances(full_url):
-    for num in range(1,10):
-        try:
-            page = urllib2.urlopen(
-                'http://www.liveinternet.ru/stat/ukrpravda/pages.html?page=%s&per_page=200' % num
-                                  ).read()
-            soup = BeautifulSoup(page)
-            soup.prettify()
-            for each in soup.findAll('a', href=True):
-                if full_url[11:] in each.get('href'):
-                    td_tag = each.parent
-                    next_td_tag = td_tag.findNext('td')
-                    return int(next_td_tag.contents[0].replace(',', ''))
-        except Exception as e:
-            print e
+    try:
+        page = urllib2.urlopen(
+            'http://www.liveinternet.ru/stat/ukrpravda/pages.html?type=only&filter=%s&ok=+OK+&report=pages.html' % full_url[11:]
+                              ).read()
+        soup = BeautifulSoup(page)
+        soup.prettify()
+        for each in soup.findAll('a', href=True):
+            if full_url[11:] in each.get('href'):
+                td_tag = each.parent
+                today_visit = td_tag.findNext('td')
+                yesterday_visit = today_visit.findNext('td').findNext('td')
+                before_yesterday_visit = yesterday_visit.findNext('td').findNext('td')
+                print today_visit, yesterday_visit, before_yesterday_visit
+                return int(today_visit.contents[0].replace(',', ''))+\
+                       int(yesterday_visit.contents[0].replace(',', ''))+\
+                       int(before_yesterday_visit.contents[0].replace(',', ''))
+    except Exception as e:
+        print e
     return 0
 
 
