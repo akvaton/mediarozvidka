@@ -46,11 +46,10 @@ class InternetTime(models.Model):
         all_visits = InternetTime.objects.filter(date__lt=datetime.today()).\
                      aggregate(Sum('visits'))['visits__sum'] or .0
         today_visits = get_today_visits()
+        moscow_time = datetime.now(timezone('Europe/Moscow')).date()
         (stored_visits, cr) = InternetTime.objects.get_or_create(
-                        date=datetime.now(timezone('Europe/Moscow')).date())
+                        date=moscow_time)
         stored_visits.visits = today_visits/cls.minute
-        if cr:
-            stored_visits.date = datetime.now(timezone('Europe/Moscow'))
         stored_visits.save()
         print "Moscow time ",datetime.now(timezone('Europe/Moscow'))
         print "Date now ", datetime.now()
