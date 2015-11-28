@@ -12,7 +12,7 @@ __date__ = '21.11.2015'
 
 from BeautifulSoup import BeautifulSoup
 import urllib2
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 
 
@@ -20,16 +20,29 @@ from django.db import models
 from django.db.models import Sum
 
 
-def get_today_visits():
+def get_today_visits(date):
     try:
-        page = urllib2.urlopen('http://www.liveinternet.ru/stat/ua/media/index.html?lang=en').read()
+        page = urllib2.urlopen('http://www.liveinternet.ru/stat/ua/media/index.html?lang=en&date=%s-%s-%s' %
+                               (date.year, date.month, date.day)).read()
         soup = BeautifulSoup(page)
         soup.prettify()
+
+        #Get today views count
         pageviews = soup.find(text="Pageviews")
         b_tag = pageviews.parent
         td_tag = b_tag.parent
-        next_td_tag = td_tag.findNext('td')
-        return int(next_td_tag.contents[0].replace(',', ''))
+        visits_td = td_tag.findNext('td')
+
+        #Get today date
+        tr_tag = td_tag.parent.findPrevious('tr')
+        td =  tr_tag.findAll('td')[1]
+        date_for_visits = datetime.strptime(td.text, '%A, %d of %B')
+
+        #Check if date in args equal today date on site
+        if date_for_visits.month == date.month and date_for_visits.day == date.day:
+            return int(visits_td.contents[0].replace(',', ''))
+        else:
+            return False
     except Exception as e:
         print e
 
@@ -45,14 +58,17 @@ class InternetTime(models.Model):
     def get_internet_time(cls):
         all_visits = InternetTime.objects.filter(date__lt=datetime.today()).\
                      aggregate(Sum('visits'))['visits__sum'] or .0
-        today_visits = get_today_visits()
         moscow_time = datetime.now(timezone('Europe/Moscow')).date()
-        (stored_visits, cr) = InternetTime.objects.get_or_create(
-                        date=moscow_time)
-        stored_visits.visits = today_visits/cls.minute
-        stored_visits.save()
-        print "Moscow time ",datetime.now(timezone('Europe/Moscow'))
-        print "Date now ", datetime.now()
+        today_visits = get_today_visits(moscow_time)
+        if today_visits:
+            stored_visits = InternetTime.objects.get_or_create(
+                            date=moscow_time)[0]
+            stored_visits.visits = today_visits/cls.minute
+            stored_visits.save()
+        else:
+            print 'Wrong day'
+        print "Moscow time ",datetime.now(timezone('Europe/Moscow')).date()
+        print "Date now ", datetime.now().date()
         print "Today visits ", today_visits
         return all_visits + float(today_visits)/cls.minute
 
