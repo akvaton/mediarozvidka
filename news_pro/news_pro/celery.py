@@ -20,10 +20,10 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.CELERYBEAT_SCHEDULE = {
     'get_new_shares': {
         'task': 'app_news.tasks.GetShares',
-        'schedule': crontab(minute='*/15')
+        'schedule': crontab(minute='15,30,45,59')
     },
     'get_new_articles': {
         'task': 'app_news.tasks.GetNews',
-        'schedule': crontab(minute='*/1')
+        'schedule': crontab(minute='1-59')
     }
 }
