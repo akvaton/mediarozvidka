@@ -1,5 +1,7 @@
 # news
-Top news for Ukrainian segment
+
+To start Celery:
+
+celery -A news_pro worker -B  --concurrency=1 --loglevel=INFO
 
 
-export DJANGO_SETTINGS_MODULE='news_pro.settings'

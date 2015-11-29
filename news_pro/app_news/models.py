@@ -50,10 +50,15 @@ class InternetTime(models.Model):
     """
     Model for storing total count of everyday visits to get "Internet time".
     """
-    minute = 100000.0
+    internet_minute = 100000.0
 
     date = models.DateField()
-    visits = models.FloatField(null=True)
+    visits = models.FloatField(default=.0, null=True)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.visits = self.visits/self.internet_minute
+        super(InternetTime, self).save()
 
     @classmethod
     def get_internet_time(cls):
@@ -64,15 +69,15 @@ class InternetTime(models.Model):
         if today_visits:
             (stored_visits, cr) = InternetTime.objects.get_or_create(
                             date=moscow_time)
-            stored_visits.visits = today_visits/cls.minute
+            stored_visits.visits = today_visits
             stored_visits.save()
 
-            # If new day starts get right count of yesterday visits
+            # Geting right count of yesterday visits if new day starts
             if cr:
                 try:
                     yesterday = moscow_time - timedelta(days=1)
                     yesterday_visits = InternetTime.objects.get(date=yesterday)
-                    yesterday_visits.visits = get_visits(yesterday)/cls.minute
+                    yesterday_visits.visits = get_visits(yesterday)
                     yesterday_visits.save()
                 except ObjectDoesNotExist:
                     print "There is no yesterday visits in db"
@@ -81,7 +86,7 @@ class InternetTime(models.Model):
         print "Moscow time ",datetime.now(timezone('Europe/Moscow')).date()
         print "Date now ", datetime.now().date()
         print "Today visits ", today_visits
-        return all_visits + float(today_visits)/cls.minute
+        return all_visits + float(today_visits)/cls.internet_minute
 
     def __unicode__(self):
         return u'%s' % self.date
