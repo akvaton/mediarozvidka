@@ -56,9 +56,9 @@ class InternetTime(models.Model):
 
     @classmethod
     def get_internet_time(cls):
-        all_visits = InternetTime.objects.filter(date__lt=datetime.today()).\
-                     aggregate(Sum('visits'))['visits__sum'] or .0
         moscow_time = datetime.now(timezone('Europe/Moscow')).date()
+        all_visits = InternetTime.objects.filter(date__lt=moscow_time).\
+                     aggregate(Sum('visits'))['visits__sum'] or .0
         today_visits = get_today_visits(moscow_time)
         if today_visits:
             stored_visits = InternetTime.objects.get_or_create(
