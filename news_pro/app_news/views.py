@@ -3,7 +3,7 @@ from django.views.generic import (View, ListView, DetailView, edit, TemplateView
                                   CreateView)
 from django.shortcuts import redirect
 
-from models import ArticleModel, get_today_visits, StatisticArticle
+from models import ArticleModel, get_visits, StatisticArticle
 from feed import get_new_articles, check_articles_shares
 # Create your views here.
 
@@ -16,20 +16,6 @@ class Index(TemplateView):
         context['last_news'] = ArticleModel.objects.all().order_by('-datetime')[:10]
 
         return context
-
-def get_articles_from_pravda(request):
-    get_new_articles()
-    return redirect('news:index')
-
-
-def get_shares(request):
-    check_articles_shares()
-    return redirect('news:index')
-
-
-def get_time(request):
-    get_today_visits()
-    return redirect('news:index')
 
 
 class AllNews(ListView):
@@ -51,3 +37,18 @@ class OneNews(DetailView):
             'shares': StatisticArticle.objects.filter(article=self.object)
         })
         return context
+
+
+def get_articles_from_pravda(request):
+    get_new_articles()
+    return redirect('news:index')
+
+
+def get_shares(request):
+    check_articles_shares()
+    return redirect('news:index')
+
+
+def get_time(request):
+    get_visits()
+    return redirect('news:index')

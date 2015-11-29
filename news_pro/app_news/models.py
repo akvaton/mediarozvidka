@@ -10,17 +10,16 @@
 __author__ = 'vZ'
 __date__ = '21.11.2015'
 
-from BeautifulSoup import BeautifulSoup
 import urllib2
+from BeautifulSoup import BeautifulSoup
 from datetime import datetime, timedelta
 from pytz import timezone
 
-
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, ObjectDoesNotExist
 
 
-def get_today_visits(date):
+def get_visits(date):
     try:
         page = urllib2.urlopen('http://www.liveinternet.ru/stat/ua/media/index.html?lang=en&date=%s-%s-%s' %
                                (date.year, date.month, date.day)).read()
@@ -48,7 +47,9 @@ def get_today_visits(date):
 
 
 class InternetTime(models.Model):
-
+    """
+    Model for storing total count of everyday visits to get "Internet time".
+    """
     minute = 100000.0
 
     date = models.DateField()
@@ -59,12 +60,22 @@ class InternetTime(models.Model):
         moscow_time = datetime.now(timezone('Europe/Moscow')).date()
         all_visits = InternetTime.objects.filter(date__lt=moscow_time).\
                      aggregate(Sum('visits'))['visits__sum'] or .0
-        today_visits = get_today_visits(moscow_time)
+        today_visits = get_visits(moscow_time)
         if today_visits:
-            stored_visits = InternetTime.objects.get_or_create(
-                            date=moscow_time)[0]
+            (stored_visits, cr) = InternetTime.objects.get_or_create(
+                            date=moscow_time)
             stored_visits.visits = today_visits/cls.minute
             stored_visits.save()
+
+            # If new day starts get right count of yesterday visits
+            if cr:
+                try:
+                    yesterday = moscow_time - timedelta(days=1)
+                    yesterday_visits = InternetTime.objects.get(date=yesterday)
+                    yesterday_visits.visits = get_visits(yesterday)/cls.minute
+                    yesterday_visits.save()
+                except ObjectDoesNotExist:
+                    print "There is no yesterday visits in db"
         else:
             print 'Wrong day'
         print "Moscow time ",datetime.now(timezone('Europe/Moscow')).date()
