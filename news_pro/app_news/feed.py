@@ -7,6 +7,7 @@ import re
 import urllib2
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime, timedelta, tzinfo
+from pytz import timezone
 
 from  models import ArticleModel, StatisticArticle, InternetTime
 
@@ -32,6 +33,11 @@ class FixedOffset(tzinfo):
         return 'FixedOffset(%d)' % (self.utcoffset().total_seconds() / 60)
 
 
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)+1):
+        yield start_date + timedelta(n)
+
+
 def get_shares_fb_total(full_url):
     try:
         return json.loads(requests.get(
@@ -50,23 +56,22 @@ def get_shares_vk_total(full_url):
     return int(match.groups()[0]) if match else 0
 
 
-def get_attendances(full_url):
+def get_attendances(article):
     try:
-        page = urllib2.urlopen(
-            'http://www.liveinternet.ru/stat/ukrpravda/pages.html?type=only&filter=%s&ok=+OK+&report=pages.html' % full_url[11:]
-                              ).read()
-        soup = BeautifulSoup(page)
-        soup.prettify()
-        for each in soup.findAll('a', href=True):
-            if full_url[11:] in each.get('href'):
-                td_tag = each.parent
-                today_visit = td_tag.findNext('td')
-                yesterday_visit = today_visit.findNext('td').findNext('td')
-                before_yesterday_visit = yesterday_visit.findNext('td').findNext('td')
-                print today_visit, yesterday_visit, before_yesterday_visit
-                return int(today_visit.contents[0].replace(',', ''))+\
-                       int(yesterday_visit.contents[0].replace(',', ''))+\
-                       int(before_yesterday_visit.contents[0].replace(',', ''))
+        moscow_time = datetime.now(timezone('Europe/Moscow')).date()
+        all_visits = 0
+        for day in daterange(article.datetime.date(), moscow_time):
+            page = urllib2.urlopen(
+                'http://www.liveinternet.ru/stat/ukrpravda/pages.html?type=only&filter=%s&date=%s-%s-%s&lang=en&ok=+OK+&report=pages.html' %
+                (article.link[11:], day.year, day.month, day.day)).read()
+
+            soup = BeautifulSoup(page)
+            soup.prettify()
+            total = soup.find(text="total")
+            td_tag = total.parent
+            today_visit = td_tag.findNext('td')
+            all_visits += int(today_visit.contents[0].replace(',', ''))
+        return all_visits
     except Exception as e:
         print e
     return 0
@@ -77,16 +82,13 @@ def get_new_articles():
     internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
         if 'pravda.com.ua' in each['link']:
+            print each['link'], each['title']
             (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
             if cr:
                 naive_date_str, _, offset_str = each['published'].rpartition(' ')
                 naive_dt = datetime.strptime(naive_date_str, '%a, %d %b %Y %H:%M:%S')
-                offset = int(offset_str[-4:-2])*60 + int(offset_str[-2:])
-                if offset_str[0] == "-":
-                   offset = -offset
-                dt = naive_dt.replace(tzinfo=FixedOffset(offset))
                 article.title = each['title']
-                article.datetime = dt
+                article.datetime = naive_dt
                 article.source = 1
                 article.internet_time = internet_time
                 article.save()
@@ -100,10 +102,10 @@ def check_articles_shares():
     active_articles = ArticleModel.objects.filter(datetime__gte = now_minus_48).\
         order_by('datetime')
     for each in active_articles:
-        #print 'Get shares for %s' % each.title
+        print 'Get shares for %s' % each.title
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
-        attendance = get_attendances(each.link)
+        attendance = get_attendances(each)
         stat = StatisticArticle(article=each,
                                 shares_fb=shares_fb,
                                 internet_time=internet_time - float(each.internet_time),
