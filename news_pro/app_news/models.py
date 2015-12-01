@@ -77,8 +77,10 @@ class InternetTime(models.Model):
                 try:
                     yesterday = moscow_time - timedelta(days=1)
                     yesterday_visits = InternetTime.objects.get(date=yesterday)
-                    yesterday_visits.visits = get_visits(yesterday)
-                    yesterday_visits.save()
+                    yesterday_visits_on_site = get_visits(yesterday)
+                    if yesterday_visits_on_site > yesterday_visits.visits:
+                        yesterday_visits.visits = yesterday_visits.visits
+                        yesterday_visits.save()
                 except ObjectDoesNotExist:
                     print "There is no yesterday visits in db"
         else:
