@@ -1,0 +1,40 @@
+<form action="#" method="get">
+    <fieldset class="form-group">
+        <div class="row">
+            <div class="col-md-2">
+                <input name="find" type="text" placeholder="Text to find" class="form-control" value="{{ text|default:''}}">
+            </div>
+            <div class="col-md-2">
+                <input name="from" class="datepicker form-control " type="text" placeholder="From"  value="{{ from|default:''}}">
+            </div>
+            <div class="col-md-2">
+                <input name="to" class="datepicker form-control" type="text" placeholder="To" value="{{ to|default:''}}">
+            </div>
+            <div class="col-md-2">
+                <input name="shares" type="number" class="form-control" placeholder="Num of shares" min="0" value="{{ shares|default:''}}">
+            </div>
+            <div class="col-md-2">
+                <select name="order" class="c-select form-control">
+                    <option value="1" {% if order = '1' %} selected {% endif %}>Time</option>
+                    <option value="2" {% if order = '2' %} selected {% endif %}>Shares</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="submit" value="Filter" class="btn btn-success btn-block">
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+{% block extra_js %}
+    <script type="text/javascript">
+      $(function() {
+         $('.datepicker').datepicker({
+             format: "yyyy-mm-dd",
+             autoclose: true,
+             todayHighlight: true,
+             language: 'ru'
+         });
+      });
+    </script>
+{% endblock %}

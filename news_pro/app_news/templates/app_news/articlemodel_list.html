@@ -3,12 +3,17 @@
 
 {% block container %}
     <div class="row container">
-        <div class="col-md-offset-1 col-md-10">
+
+        <div class="col-md-offset-1 col-md-11">
+
+            <label> Фільтри</label>
+            {% include 'app_news/filter.html' %}
+            <hr>
             <table class="table">
                 <thead>
                     <th>Стаття</th>
-                    <th>Час публікації</th>
-                    <th>Істочник</th>
+                    <th>Дата публікації</th>
+                    {% if source = '0' %} <th>Істочник</th> {% endif %}
                     <th>Internet час</th>
                 </thead>
             {% for article in object_list%}
@@ -16,9 +21,9 @@
                     <td><a href="{% url 'news:news' pk=article.id %}">
                         {{ article.title }}</a>
                     </td>
-                    <td>{{ article.datetime|date }}</td>
-                    <td>{{ article.source_name }}</td>
-                    <td>{{ article.internet_time}}</td>
+                    <td>{{ article.datetime|date:"d-m-Y" }}</td>
+                    {% if source = '0' %} <td>{{ article.source_name }}</td> {% endif %}
+                    <td>{{ article.internet_time|floatformat:3}}</td>
                 </tr>
             {% empty %}
                 <li>No articles yet.</li>

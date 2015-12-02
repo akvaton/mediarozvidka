@@ -1,6 +1,6 @@
 from celery import Task
 
-from feed import get_new_articles, check_articles_shares
+from feed import get_site_ua_articles, get_pravda_articles, check_articles_shares
 
 
 # class UrlCrawlerScript(Process):
@@ -49,4 +49,5 @@ class GetShares(Task):
 class GetNews(Task):
 
     def run(self, *args, **kwargs):
-        get_new_articles()
+        get_site_ua_articles()
+        get_site_ua_articles()

@@ -99,7 +99,7 @@ class ArticleModel(models.Model):
     Model for agregate article from news source.
     """
     SOURCE_TYPE_OPTIONS = ((1, 'pravda.com.ua'),
-                           (2, 'blog'))
+                           (2, 'site_ua'))
 
     title =  models.CharField(max_length=160, blank=True, null=True)
     link = models.URLField(max_length=160, blank=True, null=True)
@@ -109,18 +109,27 @@ class ArticleModel(models.Model):
 
     @property
     def attendance(self):
-        return StatisticArticle.objects.filter(article=self).\
-                    aggregate(Sum('attendance'))['attendance__sum']
+        att = StatisticArticle.objects.filter(article=self).last()
+        if att:
+            return getattr(att, 'attendance')
+        else:
+            return 0
 
     @property
     def shares_fb_total(self):
-       return StatisticArticle.objects.filter(article=self).\
-                    aggregate(Sum('shares_fb'))['shares_fb__sum']
+        fb = StatisticArticle.objects.filter(article=self).last()
+        if fb:
+            return getattr(fb, 'shares_fb')
+        else:
+            return 0
 
     @property
     def shares_vk_total(self):
-        return StatisticArticle.objects.filter(article=self).\
-                    aggregate(Sum('shares_vk'))['shares_vk__sum']
+        vk = StatisticArticle.objects.filter(article=self).last()
+        if vk:
+            return getattr(vk, 'shares_vk')
+        else:
+            return 0
 
     @property
     def source_name(self):

@@ -2,15 +2,17 @@
 
 {% block container %}
     <div class="row container-fluid">
-        <div class="col-md-4 col-md-offset-2">
+        <div class="col-md-6 col-md-offset-1">
             {% if last_news %}
             <table class="table">
                 <thead>
                     <th>Article title</th>
+                    <th>Sourcee</th>
                 </thead>
             {% for each in last_news %}
                 <tr height="60px">
                     <td>{{ each.title }}</td>
+                    <td>{{ each.source_name }}</td>
                 </tr>
             {% endfor %}
             </table>
@@ -36,8 +38,6 @@
             {% endif %}
             <a class="btn btn-block btn-success" href="{% url 'news:get_shares' %}">Get shares</a>
         </div>
-        <div class="col-md-2">
-            <a class="btn btn-block btn-success" href="{% url 'news:get_time' %}">Internet time</a>
-        </div>
+
     </div>
 {% endblock container %}

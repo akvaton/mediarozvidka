@@ -11,8 +11,10 @@ from pytz import timezone
 
 from  models import ArticleModel, StatisticArticle, InternetTime
 
-pravda_url = 'http://www.pravda.com.ua/rss/view_pubs/'
-
+urls = {
+'pravda':'http://www.pravda.com.ua/rss/view_pubs/',
+'site_ua': 'https://site.ua/rss-all.xml'
+}
 
 class FixedOffset(tzinfo):
     """Fixed offset in minutes: `time = utc_time + utc_offset`."""
@@ -77,8 +79,8 @@ def get_attendances(article):
     return 0
 
 
-def get_new_articles():
-    rssfeed = feedparser.parse(pravda_url)
+def get_pravda_articles():
+    rssfeed = feedparser.parse(urls['pravda'])
     internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
         if 'pravda.com.ua' in each['link']:
@@ -96,6 +98,42 @@ def get_new_articles():
                 break
 
 
+def get_pravda_articles():
+    rssfeed = feedparser.parse(urls['pravda'])
+    internet_time = InternetTime.get_internet_time()
+    for each in rssfeed.entries:
+        if 'pravda.com.ua' in each['link']:
+            print each['link'], each['title']
+            (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
+            if cr:
+                naive_date_str, _, offset_str = each['published'].rpartition(' ')
+                naive_dt = datetime.strptime(naive_date_str, '%a, %d %b %Y %H:%M:%S')
+                article.title = each['title']
+                article.datetime = naive_dt
+                article.source = 1
+                article.internet_time = internet_time
+                article.save()
+            else:
+                break
+
+
+def get_site_ua_articles():
+    rssfeed = feedparser.parse(urls['site_ua'])
+    internet_time = InternetTime.get_internet_time()
+    for each in rssfeed.entries:
+        (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
+        if cr:
+            naive_date_str, _, offset_str = each['published'].rpartition(' ')
+            naive_dt = datetime.strptime(naive_date_str, '%a, %d %b %Y %H:%M:%S')
+            article.title = each['title']
+            article.datetime = naive_dt
+            article.source = 2
+            article.internet_time = internet_time
+            article.save()
+        else:
+            break
+
+
 def check_articles_shares():
     now_minus_48 = datetime.today()-timedelta(hours=48)
     internet_time = InternetTime.get_internet_time()
@@ -105,7 +143,7 @@ def check_articles_shares():
         print 'Get shares for %s' % each.title
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
-        attendance = get_attendances(each)
+        attendance = get_attendances(each) if each.source == 1 else None
         stat = StatisticArticle(article=each,
                                 shares_fb=shares_fb,
                                 internet_time=internet_time - float(each.internet_time),

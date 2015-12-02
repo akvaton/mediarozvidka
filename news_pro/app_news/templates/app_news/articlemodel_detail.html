@@ -5,7 +5,6 @@
 <div class="row container">
 
     <div class="col-md-offset-2">
-   <h2>  <a href="{% url 'news:all' %}" class="btn btn-success">Back</a> <hr> {{ articlemodel.title }} </h2>
     <table class="table">
         <thead>
             <th>Час запросу</th>
@@ -17,15 +16,19 @@
         <tbody>
             {% for share in shares %}
             <tr>
-                <td>{{ share.datetime }}</td>
+                <td>{{ share.datetime|date:"d-m-Y H:i" }}</td>
                 <td>{{ share.shares_fb}}</td>
                 <td>{{ share.shares_vk}}</td>
                 <td>{{ share.attendance}}</td>
-                <td>{{ share.internet_time }}</td>
+                <td>{{ share.internet_time|floatformat:3 }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+        <form id="xls_form" action="{% url 'news:xls' %}" method="get" )>
+            <input type="hidden" name="pk" value="{{ object.pk }}">
+            <button class="btn btn-success pull-right btn-lg" id="get_xls">Get file</button>
+        </form>
     </div>
 </div>
 {% endblock container %}

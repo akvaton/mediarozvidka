@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block container %}
+<div class="row container-fluid">
+    <hr>
+    <div class="col-md-6">
+        <a href="{% url 'news:news_type' 1 %}" class="btn btn-info btn-block"><h1>Go to <hr> Pravda.com.ua</h1></a>
+    </div>
+    <div class="col-md-6">
+        <a href="{% url 'news:news_type' 2 %}" class="btn btn-info btn-block"><h1>Go to <hr> Site.ua</h1></a>
+    </div>
+{% endblock container %}
