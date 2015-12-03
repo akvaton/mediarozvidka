@@ -97,7 +97,7 @@ def get_time(request):
 def save_to_excel(request):
     pk = int(request.GET.get('pk'))
     book = xlwt.Workbook(encoding="utf-8")
-    sheet1 = book.add_sheet("Sheet 1")
+    sheet = book.add_sheet("Новина")
 
     article = ArticleModel.objects.get(pk=pk)
     statistics = StatisticArticle.objects.filter(article=article)
@@ -106,23 +106,22 @@ def save_to_excel(request):
     style_string = "font: italic on"
     style = xlwt.easyxf(style_string)
 
-    sheet1.write(0, 0, article.title, style)
+    sheet.write(0, 0, article.title, style)
 
     style_string = "font: bold on; borders: bottom double"
     style = xlwt.easyxf(style_string)
 
     column_names = ['Час запросу', 'Shares FB',	'Shares VK', 'Attendance',	'Internet час']
     for i in range(len(column_names)):
-        sheet1.write(1, i, column_names[i], style)
-    i=0
+        sheet.write(1, i, column_names[i], style)
+    i=2
     for each in statistics:
+        sheet.write(i,0,each.datetime.strftime("%d-%m-%y %H:%M"))
+        sheet.write(i,1,each.shares_fb)
+        sheet.write(i,2,each.shares_vk)
+        sheet.write(i,3,each.attendance)
+        sheet.write(i,4,each.internet_time)
         i+=1
-        sheet1.write(i+1,0,  each.datetime.strftime("%d-%m-%y %H:%M"))
-        sheet1.write(i+1,1,  each.shares_fb)
-        sheet1.write(i+1,2,  each.shares_vk)
-        sheet1.write(i+1,3,  each.attendance)
-        sheet1.write(i+1,4,  each.internet_time)
-
 
     a = StringIO.StringIO()
     book.save(a)
