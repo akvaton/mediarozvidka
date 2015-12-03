@@ -49,5 +49,5 @@ class GetShares(Task):
 class GetNews(Task):
 
     def run(self, *args, **kwargs):
-        get_site_ua_articles()
+        get_pravda_articles()
         get_site_ua_articles()
