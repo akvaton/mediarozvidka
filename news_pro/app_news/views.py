@@ -3,7 +3,6 @@
 
 import xlwt
 import StringIO
-
 from datetime import timedelta, datetime
 
 from django.views.generic import (View, ListView, DetailView, edit, TemplateView,
@@ -15,6 +14,8 @@ from django.http import HttpResponse
 from models import ArticleModel, get_visits, StatisticArticle
 from feed import get_pravda_articles, check_articles_shares, get_site_ua_articles
 # Create your views here.
+
+c
 
 class Index(TemplateView):
 

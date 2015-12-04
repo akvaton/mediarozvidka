@@ -2,20 +2,20 @@
     <fieldset class="form-group">
         <div class="row">
             <div class="col-md-2">
-                <input name="find" type="text" placeholder="Text to find" class="form-control" value="{{ text|default:''}}">
+                <input name="find" type="text" placeholder="Текст для пошуку" class="form-control" value="{{ text|default:''}}">
             </div>
             <div class="col-md-2">
-                <input name="from" class="datepicker form-control " type="text" placeholder="From"  value="{{ from|default:''}}">
+                <input name="from" class="datepicker form-control " type="text" placeholder="Час початку"  value="{{ from|default:''}}">
             </div>
             <div class="col-md-2">
-                <input name="to" class="datepicker form-control" type="text" placeholder="To" value="{{ to|default:''}}">
+                <input name="to" class="datepicker form-control" type="text" placeholder="Час закінчення" value="{{ to|default:''}}">
             </div>
             <div class="col-md-2">
-                <input name="shares" type="number" class="form-control" placeholder="Num of shares" min="0" value="{{ shares|default:''}}">
+                <input name="shares" type="number" class="form-control" placeholder="Кількість shares" min="0" value="{{ shares|default:''}}">
             </div>
             <div class="col-md-2">
                 <select name="order" class="c-select form-control">
-                    <option value="1" {% if order = '1' %} selected {% endif %}>Time</option>
+                    <option value="1" {% if order = '1' %} selected {% endif %}>Час</option>
                     <option value="2" {% if order = '2' %} selected {% endif %}>Shares</option>
                 </select>
             </div>
