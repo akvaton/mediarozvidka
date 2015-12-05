@@ -5,8 +5,7 @@ import xlwt
 import StringIO
 from datetime import timedelta, datetime
 
-from django.views.generic import (View, ListView, DetailView, edit, TemplateView,
-                                  CreateView)
+from django.views.generic import ListView, DetailView, TemplateView
 from django.shortcuts import redirect
 from django.http import HttpResponse
 
@@ -46,9 +45,11 @@ class AllNews(ListView):
                         'order':order,'text':text_to_find,'source':source})
         if from_date and to_date:
             to_date = datetime.strptime(to_date,"%Y-%m-%d")+timedelta(days=1)
-            articles = articles.filter(datetime__range = (from_date, to_date))
+            articles = articles.filter(datetime__range=(from_date, to_date))
         if num_of_shares:
-            exclude_articles = [each.id for each in articles if each.shares_fb_total+each.shares_vk_total < int(num_of_shares)]
+            exclude_articles = [each.id for each in articles
+                                if each.shares_fb_total+each.shares_vk_total <
+                                int(num_of_shares)]
             articles = articles.exclude(id__in=exclude_articles)
         if text_to_find:
             articles = articles.filter(title__icontains=text_to_find)
@@ -56,7 +57,6 @@ class AllNews(ListView):
             articles = reversed(sorted(articles, key=lambda t: t.shares_fb_total))
 
         context['object_list'] = articles
-
         return context
 
 
@@ -71,11 +71,9 @@ class OneNews(DetailView):
         return context
 
 
-def start(request):
-    redirect('')
-
 class SourceChoice(TemplateView):
     template_name = 'app_news/choice.html'
+
 
 def get_articles(request):
     get_pravda_articles()
@@ -101,7 +99,6 @@ def save_to_excel(request):
     article = ArticleModel.objects.get(pk=pk)
     statistics = StatisticArticle.objects.filter(article=article)
 
-
     style_string = "font: italic on"
     style = xlwt.easyxf(style_string)
 
@@ -110,17 +107,18 @@ def save_to_excel(request):
     style_string = "font: bold on; borders: bottom double"
     style = xlwt.easyxf(style_string)
 
-    column_names = ['Час запросу', 'Shares FB',	'Shares VK', 'Attendance',	'Internet час']
+    column_names = ['Час запросу', 'Shares FB',	'Shares VK',
+                    'Attendance',	'Internet час']
     for i in range(len(column_names)):
         sheet.write(1, i, column_names[i], style)
-    i=2
+    i = 2
     for each in statistics:
-        sheet.write(i,0,each.datetime.strftime("%d-%m-%y %H:%M"))
-        sheet.write(i,1,each.shares_fb)
-        sheet.write(i,2,each.shares_vk)
-        sheet.write(i,3,each.attendance)
-        sheet.write(i,4,each.internet_time)
-        i+=1
+        sheet.write(i, 0, each.datetime.strftime("%d-%m-%y %H:%M"))
+        sheet.write(i, 1, each.shares_fb)
+        sheet.write(i, 2, each.shares_vk)
+        sheet.write(i, 3, each.attendance)
+        sheet.write(i, 4, each.internet_time)
+        i += 1
 
     a = StringIO.StringIO()
     book.save(a)

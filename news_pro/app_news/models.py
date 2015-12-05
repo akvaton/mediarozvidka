@@ -26,18 +26,18 @@ def get_visits(date):
         soup = BeautifulSoup(page)
         soup.prettify()
 
-        #Get today views count
+        # Get today views count
         pageviews = soup.find(text="Pageviews")
         b_tag = pageviews.parent
         td_tag = b_tag.parent
         visits_td = td_tag.findNext('td')
 
-        #Get today date
+        # Get today date
         tr_tag = td_tag.parent.findPrevious('tr')
         td =  tr_tag.findAll('td')[1]
         date_for_visits = datetime.strptime(td.text, '%A, %d of %B')
 
-        #Check if date in args equal today date on site
+        # Check if date in args equal today date on site
         if date_for_visits.month == date.month and date_for_visits.day == date.day:
             return int(visits_td.contents[0].replace(',', ''))
         else:
@@ -57,14 +57,14 @@ class InternetTime(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        self.visits = self.visits/self.internet_minute
+        self.visits /= self.internet_minute
         super(InternetTime, self).save()
 
     @classmethod
     def get_internet_time(cls):
         moscow_time = datetime.now(timezone('Europe/Moscow')).date()
         all_visits = InternetTime.objects.filter(date__lt=moscow_time).\
-                     aggregate(Sum('visits'))['visits__sum'] or .0
+            aggregate(Sum('visits'))['visits__sum'] or .0
         today_visits = get_visits(moscow_time)
         if today_visits:
             (stored_visits, cr) = InternetTime.objects.get_or_create(

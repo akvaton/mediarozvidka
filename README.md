@@ -13,8 +13,19 @@ Install all dependencies form requirements.txt
 
     pip install -r requirements.txt
     
-Create *local_settings.py* and add database settings to it or, if you want to use sqlite, you don't have to
- do anything. **But with sqlite text filtering will be the register sensetive only.**
+Create *local_settings.py* and add database settings to it.
+ 
+ If you want to use sqlite, you don't have to do anything. **But with sqlite text filtering will be the register sensetive only.**
+ 
+ If you want to use mySQL, yot have to create table with right charset first:
+ 
+        mysql -u <your username> -p; #to enter mysql console
+        
+    And create database:
+      
+        create DATABASE <your db name> DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+ 
+ 
  
 Make migrations
     
