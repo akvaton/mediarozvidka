@@ -92,8 +92,6 @@ def get_pravda_articles():
                 article.source = 1
                 article.internet_time = internet_time
                 article.save()
-            else:
-                break
 
 
 def get_site_ua_articles():
