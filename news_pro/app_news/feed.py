@@ -13,7 +13,7 @@ from models import ArticleModel, StatisticArticle, InternetTime
 
 urls = {
 'pravda':'http://www.pravda.com.ua/rss/view_pubs/',
-'site_ua': 'https://site.ua/rss-all.xml'
+'site_ua': ['https://site.ua/rss-all.xml','https://site.ua/rss.xml']
 }
 
 
@@ -74,41 +74,24 @@ def get_pravda_articles():
                 article.source = 1
                 article.internet_time = internet_time
                 article.save()
-            else:
-                break
 
 
-def get_pravda_articles():
-    rssfeed = feedparser.parse(urls['pravda'])
-    internet_time = InternetTime.get_internet_time()
-    for each in rssfeed.entries:
-        if 'pravda.com.ua' in each['link']:
+def get_site_ua_articles():
+    for rss_link in urls['site_ua']:
+        rssfeed = feedparser.parse(rss_link)
+        internet_time = InternetTime.get_internet_time()
+        for each in rssfeed.entries:
             (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
             if cr:
                 naive_date_str, _, offset_str = each['published'].rpartition(' ')
                 naive_dt = datetime.strptime(naive_date_str, '%a, %d %b %Y %H:%M:%S')
                 article.title = each['title']
                 article.datetime = naive_dt
-                article.source = 1
+                article.source = 2
                 article.internet_time = internet_time
                 article.save()
-
-
-def get_site_ua_articles():
-    rssfeed = feedparser.parse(urls['site_ua'])
-    internet_time = InternetTime.get_internet_time()
-    for each in rssfeed.entries:
-        (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
-        if cr:
-            naive_date_str, _, offset_str = each['published'].rpartition(' ')
-            naive_dt = datetime.strptime(naive_date_str, '%a, %d %b %Y %H:%M:%S')
-            article.title = each['title']
-            article.datetime = naive_dt
-            article.source = 2
-            article.internet_time = internet_time
-            article.save()
-        else:
-            break
+            else:
+                break
 
 
 def check_articles_shares():
