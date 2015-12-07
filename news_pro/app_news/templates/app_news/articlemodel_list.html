@@ -14,7 +14,7 @@
                     <th>Стаття</th>
                     <th>Дата публікації</th>
                     {% if source = '0' %} <th>Джерело</th> {% endif %}
-                    <th>Internet час</th>
+                    <th>Shares Fb</th>
                 </thead>
             {% for article in object_list%}
                 <tr>
@@ -23,7 +23,7 @@
                     </td>
                     <td>{{ article.datetime|date:"d-m-Y" }}</td>
                     {% if source = '0' %} <td>{{ article.source_name }}</td> {% endif %}
-                    <td>{{ article.internet_time|floatformat:3}}</td>
+                    <td>{{ article.shares_fb_total }}</td>
                 </tr>
             {% empty %}
                 <li>No articles yet.</li>

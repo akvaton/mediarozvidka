@@ -90,8 +90,6 @@ def get_site_ua_articles():
                 article.source = 2
                 article.internet_time = internet_time
                 article.save()
-            else:
-                break
 
 
 def check_articles_shares():

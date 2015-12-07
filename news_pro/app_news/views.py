@@ -66,7 +66,7 @@ class OneNews(DetailView):
     def get_context_data(self, **kwargs):
         context = super(OneNews, self).get_context_data(**kwargs)
         context.update({
-            'shares': StatisticArticle.objects.filter(article=self.object)
+            'shares': StatisticArticle.objects.filter(article=self.object),
         })
         return context
 
