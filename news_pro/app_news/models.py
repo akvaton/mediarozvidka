@@ -1,5 +1,5 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
+##! /usr/bin/python
+##-*- coding: utf-8 -*-
 """
     news_pro.app_news.models
     ~~~~~~~~~
