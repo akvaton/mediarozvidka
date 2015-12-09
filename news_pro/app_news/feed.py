@@ -5,6 +5,8 @@ import json
 import requests
 import re
 import urllib2
+from news_pro.local_settings import APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+from twython import Twython
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime, timedelta
 from pytz import timezone
@@ -13,7 +15,9 @@ from models import ArticleModel, StatisticArticle, InternetTime
 
 urls = {
 'pravda':'http://www.pravda.com.ua/rss/view_pubs/',
-'site_ua': ['https://site.ua/rss-all.xml','https://site.ua/rss.xml']
+'site_ua': ['https://site.ua/rss-all.xml','https://site.ua/rss.xml'],
+'wp':'https://www.washingtonpost.com/newssearch/?query=ukraine',
+'nyt':'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
 }
 
 
@@ -38,6 +42,12 @@ def get_shares_vk_total(full_url):
         ).text
     match = re.match(re_mask, rq_text)
     return int(match.groups()[0]) if match else 0
+
+
+def get_shares_twitter(full_url):
+    twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+    search = twitter.search(q=full_url)['statuses']
+    return len(search)
 
 
 def get_attendances(article):
@@ -98,12 +108,36 @@ def check_articles_shares():
     active_articles = ArticleModel.objects.filter(datetime__gte=now_minus_48).\
         order_by('datetime')
     for each in active_articles:
+        shares_twitter = get_shares_twitter(each.link)
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
         attendance = get_attendances(each) if each.source == 1 else None
         stat = StatisticArticle(article=each,
                                 shares_fb=shares_fb,
+                                shares_twitter=shares_twitter,
                                 internet_time=internet_time - float(each.internet_time),
                                 shares_vk=shares_vk,
                                 attendance=attendance)
         stat.save()
+
+
+def get_nyt_articles():
+    page = urllib2.urlopen(urls['nyt']).read()
+    soup = BeautifulSoup(page)
+    today = datetime.now()
+    soup.prettify()
+    internet_time = InternetTime.get_internet_time()
+    searcn_div = soup.find('div',{"id":"searchList"})
+    for each in searcn_div.findAll('h4'):
+        link = each.find('a')['href']
+        title = each.find('a').text
+        time = datetime.strptime(each.findNext('h6').text, '%B %d, %Y, %A')
+        time = time.replace(hour=today.hour, minute=today.minute)
+        (article, cr) = ArticleModel.objects.get_or_create(link=link)
+        if cr:
+            article.title = title
+            article.datetime = time
+            article.source = 3
+            article.internet_time = internet_time
+            article.save()
+

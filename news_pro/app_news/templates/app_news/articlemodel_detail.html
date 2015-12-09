@@ -10,6 +10,7 @@
             <th>Час запросу</th>
             <th>Поширення FB</th>
             <th>Поширення VK</th>
+            <th>Поширення Twitter</th>
             <th>Відвідування</th>
             <th>Internet час</th>
         </thead>
@@ -19,6 +20,7 @@
                 <td>{{ share.datetime|date:"d-m-Y H:i" }}</td>
                 <td>{{ share.shares_fb}}</td>
                 <td>{{ share.shares_vk}}</td>
+                <td>{{ share.shares_twitter}}</td>
                 <td>{{ share.attendance}}</td>
                 <td>{{ share.internet_time|floatformat:3 }}</td>
             </tr>

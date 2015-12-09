@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 
 from models import ArticleModel, get_visits, StatisticArticle
-from feed import get_pravda_articles, check_articles_shares, get_site_ua_articles
+from feed import get_pravda_articles, get_site_ua_articles, get_nyt_articles, check_articles_shares
 # Create your views here.
 
 
@@ -48,7 +48,7 @@ class AllNews(ListView):
             articles = articles.filter(datetime__range=(from_date, to_date))
         if num_of_shares:
             exclude_articles = [each.id for each in articles
-                                if each.shares_fb_total+each.shares_vk_total <
+                                if each.shares_fb_total+each.shares_vk_total+each.shares_twitter_total <
                                 int(num_of_shares)]
             articles = articles.exclude(id__in=exclude_articles)
         if text_to_find:
@@ -78,13 +78,14 @@ class SourceChoice(TemplateView):
 def get_articles(request):
     get_pravda_articles()
     get_site_ua_articles()
+    get_nyt_articles()
     return redirect('news:index')
 
 
 def get_shares(request):
     check_articles_shares()
     return redirect('news:index')
-
+    # get_google_searches()
 
 def get_time(request):
     get_visits()
