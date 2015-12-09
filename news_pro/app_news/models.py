@@ -142,8 +142,8 @@ class ArticleModel(models.Model):
     """
     Model for agregate article from news source.
     """
-    SOURCE_TYPE_OPTIONS = ((1, 'pravda.com.ua'),
-                           (2, 'site_ua'),
+    SOURCE_TYPE_OPTIONS = ((1, 'Pravda.com.ua'),
+                           (2, 'Site.ua'),
                            (3, 'NewYork times'))
 
     title =  models.CharField(max_length=160, blank=True, null=True)
