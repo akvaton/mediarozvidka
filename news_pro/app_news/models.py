@@ -14,7 +14,6 @@ import urllib2
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime, timedelta
 from pytz import timezone
-from selenium import webdriver
 
 from django.db import models
 from django.db.models import Sum, ObjectDoesNotExist
