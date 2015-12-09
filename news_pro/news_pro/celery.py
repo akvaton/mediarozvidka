@@ -28,6 +28,6 @@ app.conf.CELERYBEAT_SCHEDULE = {
     },
     'get_new_nyt_articles': {
         'task': 'app_news.tasks.GetNYT',
-        'schedule': crontab(minute='01',hour='00-03,14-24')
+        'schedule': crontab(minute='01',hour='00-03,14-23')
     }
 }
