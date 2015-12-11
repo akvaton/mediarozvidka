@@ -1,5 +1,5 @@
 *.pyc
 .idea/
 *.sqlite3
-local_settings.py
+news_pro/news_pro/local_settings.py
 celerybeat-schedule.db
