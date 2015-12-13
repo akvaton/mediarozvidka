@@ -10,7 +10,8 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 
 from models import ArticleModel, get_visits, StatisticArticle
-from feed import get_pravda_articles, get_site_ua_articles, get_nyt_articles, check_articles_shares
+from feed import (get_pravda_articles, get_site_ua_articles,
+                  get_nyt_articles, check_articles_shares)
 # Create your views here.
 
 
@@ -37,7 +38,8 @@ class AllNews(ListView):
         context = super(AllNews, self).get_context_data(**kwargs)
         if 'source' in self.kwargs:
             source = self.kwargs['source']
-            articles = ArticleModel.objects.filter(source=source).order_by('-datetime')
+            articles = ArticleModel.objects.filter(source=source).\
+                order_by('-datetime')
         else:
             source = '0'
             articles = ArticleModel.objects.all().order_by('-datetime')
@@ -48,9 +50,10 @@ class AllNews(ListView):
             articles = articles.filter(datetime__range=(from_date, to_date))
         if num_of_shares:
             exclude_articles = [each.id for each in articles
-                                if each.shares_fb_total+each.shares_vk_total+each.shares_twitter_total <
-                                int(num_of_shares)]
-            articles = articles.exclude(id__in=exclude_articles)
+                            if (each.shares_fb_total +
+                                each.shares_vk_total +
+                                each.shares_twitter_total) < int(num_of_shares)]
+        articles = articles.exclude(id__in=exclude_articles)
         if text_to_find:
             articles = articles.filter(title__icontains=text_to_find)
         if order == '2':
@@ -85,7 +88,7 @@ def get_articles(request):
 def get_shares(request):
     check_articles_shares()
     return redirect('news:index')
-    # get_google_searches()
+
 
 def get_time(request):
     get_visits()

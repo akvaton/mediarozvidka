@@ -5,19 +5,19 @@ import json
 import requests
 import re
 import urllib2
-from news_pro.local_settings import APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET
 from twython import Twython
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime, timedelta
 from pytz import timezone
 
 from models import ArticleModel, StatisticArticle, InternetTime
+from django.conf import settings
+
 
 urls = {
-'pravda':'http://www.pravda.com.ua/rss/view_pubs/',
+'pravda': 'http://www.pravda.com.ua/rss/view_pubs/',
 'site_ua': ['https://site.ua/rss-all.xml','https://site.ua/rss.xml'],
-'wp':'https://www.washingtonpost.com/newssearch/?query=ukraine',
-'nyt':'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
+'nyt': 'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
 }
 
 
@@ -45,7 +45,10 @@ def get_shares_vk_total(full_url):
 
 
 def get_shares_twitter(full_url):
-    twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+    twitter = Twython(settings.APP_KEY,
+                      settings.APP_SECRET,
+                      settings.OAUTH_TOKEN,
+                      settings.OAUTH_TOKEN_SECRET)
     search = twitter.search(q=full_url)['statuses']
     return len(search)
 
@@ -77,8 +80,9 @@ def get_pravda_articles():
         if 'pravda.com.ua' in each['link']:
             (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
             if cr:
-                naive_date_str, _, offset_str = each['published'].rpartition(' ')
-                naive_dt = datetime.strptime(naive_date_str, '%a, %d %b %Y %H:%M:%S')
+                naive_date_str = each['published'].rpartition(' ')[0]
+                naive_dt = datetime.strptime(naive_date_str,
+                                             '%a, %d %b %Y %H:%M:%S')
                 article.title = each['title']
                 article.datetime = naive_dt
                 article.source = 1
@@ -94,7 +98,8 @@ def get_site_ua_articles():
             (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
             if cr:
                 naive_date_str, _, offset_str = each['published'].rpartition(' ')
-                naive_dt = datetime.strptime(naive_date_str, '%a, %d %b %Y %H:%M:%S')
+                naive_dt = datetime.strptime(naive_date_str,
+                                             '%a, %d %b %Y %H:%M:%S')
                 article.title = each['title']
                 article.datetime = naive_dt
                 article.source = 2
@@ -106,18 +111,20 @@ def check_articles_shares():
     now_minus_48 = datetime.today()-timedelta(hours=48)
     internet_time = InternetTime.get_internet_time()
     active_articles = ArticleModel.objects.filter(datetime__gte=now_minus_48).\
-        order_by('datetime')
+                      order_by('datetime')
     for each in active_articles:
         shares_twitter = get_shares_twitter(each.link)
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
         attendance = get_attendances(each) if each.source == 1 else None
-        stat = StatisticArticle(article=each,
-                                shares_fb=shares_fb,
-                                shares_twitter=shares_twitter,
-                                internet_time=internet_time - float(each.internet_time),
-                                shares_vk=shares_vk,
-                                attendance=attendance)
+        stat = StatisticArticle(
+                        article=each,
+                        shares_fb=shares_fb,
+                        shares_twitter=shares_twitter,
+                        internet_time=internet_time - float(each.internet_time),
+                        shares_vk=shares_vk,
+                        attendance=attendance
+                                )
         stat.save()
 
 
@@ -127,7 +134,7 @@ def get_nyt_articles():
     today = datetime.now()
     soup.prettify()
     internet_time = InternetTime.get_internet_time()
-    searcn_div = soup.find('div',{"id":"searchList"})
+    searcn_div = soup.find('div', {"id": "searchList"})
     for each in searcn_div.findAll('h4'):
         link = each.find('a')['href']
         title = each.find('a').text
@@ -140,4 +147,3 @@ def get_nyt_articles():
             article.source = 3
             article.internet_time = internet_time
             article.save()
-

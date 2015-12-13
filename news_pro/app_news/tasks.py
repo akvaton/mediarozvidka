@@ -1,6 +1,7 @@
 from celery import Task
 
-from feed import get_site_ua_articles, get_pravda_articles, check_articles_shares, get_nyt_articles
+from feed import (get_site_ua_articles, get_pravda_articles,
+                  check_articles_shares, get_nyt_articles)
 
 
 class GetShares(Task):

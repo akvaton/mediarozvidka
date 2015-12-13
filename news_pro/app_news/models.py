@@ -34,7 +34,7 @@ def get_visits(date):
 
         # Get today date
         tr_tag = td_tag.parent.findPrevious('tr')
-        td =  tr_tag.findAll('td')[1]
+        td = tr_tag.findAll('td')[1]
         date_for_visits = datetime.strptime(td.text, '%A, %d of %B')
 
         # Check if date in args equal today date on site
@@ -44,39 +44,6 @@ def get_visits(date):
             return False
     except Exception as e:
         print e
-
-#
-# def get_google_searches():
-#     print '*'*50
-#     try:
-#         # driver = webdriver.PhantomJS(executable_path='/Users/vZ/Downloads/phantomjs-2.0.0-macosx/bin/phantomjs')
-#         # driver.get('http://www.internetlivestats.com/google-search-statistics/')
-#         # print driver.find_element_by_class_name('innercounter')
-#         opener = urllib2.build_opener()
-#         # opener.addheaders.append(('Cookie', '__cfduid=d6ec5425d2e97b035e7787585d47a1fa71449646570'))
-#         page = opener.open('http://pennystocks.la/internet-in-real-time/').read()
-#         soup = BeautifulSoup(page)
-#         soup.prettify()
-#         print soup
-#         # Get today views count
-#         pageviews = soup.find('div',{'class':'innercounter'})
-#         print pageviews
-#         # b_tag = pageviews.parent
-#         # td_tag = b_tag.parent
-#         # visits_td = td_tag.findNext('td')
-#         #
-#         # # Get today date
-#         # tr_tag = td_tag.parent.findPrevious('tr')
-#         # td =  tr_tag.findAll('td')[1]
-#         # date_for_visits = datetime.strptime(td.text, '%A, %d of %B')
-#         #
-#         # # Check if date in args equal today date on site
-#         # if date_for_visits.month == date.month and date_for_visits.day == date.day:
-#         #     return int(visits_td.contents[0].replace(',', ''))
-#         # else:
-#         #     return False
-#     except Exception as e:
-#         print e
 
 
 class InternetTime(models.Model):
@@ -118,24 +85,11 @@ class InternetTime(models.Model):
                     print "There is no yesterday visits in db"
         else:
             print 'Wrong day'
-        print "Moscow time ",datetime.now(timezone('Europe/Moscow')).date()
-        print "Date now ", datetime.now().date()
-        print "Today visits ", today_visits
+
         return all_visits + float(today_visits)/cls.internet_minute
 
     def __unicode__(self):
         return u'%s' % self.date
-
-
-# class GoogleSearches(InternetTime):
-#     """
-#     Model for storing total count of everyday Google searches.
-#     """
-#     internet_minute = 100000.0
-#
-#     @classmethod
-#     def get_internet_time(cls):
-#         pass
 
 
 class ArticleModel(models.Model):
@@ -146,7 +100,7 @@ class ArticleModel(models.Model):
                            (2, 'Site.ua'),
                            (3, 'NewYork times'))
 
-    title =  models.CharField(max_length=160, blank=True, null=True)
+    title = models.CharField(max_length=160, blank=True, null=True)
     link = models.URLField(max_length=160, blank=True, null=True)
     datetime = models.DateTimeField(auto_now_add=True)
     internet_time = models.FloatField(default=0)
