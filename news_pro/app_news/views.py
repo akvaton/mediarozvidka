@@ -45,17 +45,21 @@ class AllNews(ListView):
             articles = ArticleModel.objects.all().order_by('-datetime')
         context.update({'from':from_date,'to':to_date,'shares':num_of_shares,
                         'order':order,'text':text_to_find,'source':source})
+        # Filter by date range if needed
         if from_date and to_date:
             to_date = datetime.strptime(to_date,"%Y-%m-%d")+timedelta(days=1)
             articles = articles.filter(datetime__range=(from_date, to_date))
+        # Filter by amount of all shares if needed
         if num_of_shares:
             exclude_articles = [each.id for each in articles
                             if (each.shares_fb_total +
                                 each.shares_vk_total +
                                 each.shares_twitter_total) < int(num_of_shares)]
         articles = articles.exclude(id__in=exclude_articles)
+        # Filter by text in title if needed
         if text_to_find:
             articles = articles.filter(title__icontains=text_to_find)
+        # Order by facebook shares if needed
         if order == '2':
             articles = reversed(sorted(articles, key=lambda t: t.shares_fb_total))
 

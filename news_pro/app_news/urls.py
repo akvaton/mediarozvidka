@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from django.conf.urls import url
 from django.conf import settings
-from .views import (Index, get_articles, get_shares, get_time,
+from .views import (Index, get_articles, get_shares,
                     AllNews, OneNews, save_to_excel)
 
 urlpatterns = [
