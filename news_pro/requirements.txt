@@ -1,6 +1,5 @@
-BeautifulSoup==3.2.1
 Django==1.7.4
-MySQL-python==1.2.5
+BeautifulSoup==3.2.1
 amqp==1.4.7
 anyjson==0.3.3
 argparse==1.2.1
@@ -11,7 +10,6 @@ django-celery==3.1.16
 django-import-export==0.2.6
 feedparser==5.2.1
 kombu==3.0.29
-mysql==0.0.1
 oauthlib==1.0.3
 pytz==2015.7
 redis==2.10.5
@@ -22,3 +20,7 @@ twython==3.3.0
 uWSGI==2.0.11.2
 wsgiref==0.1.2
 xlwt==1.0.0
+
+# MySQL dependencies
+MySQL-python==1.2.5
+mysql==0.0.1

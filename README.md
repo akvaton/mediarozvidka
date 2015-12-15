@@ -13,9 +13,14 @@ Install all dependencies form requirements.txt
 
     pip install -r requirements.txt
     
-Create *local_settings.py* and add database settings to it.
+Create *local_settings.py* and add database settings and twitter keys to it.
+
+    APP_KEY = ''
+    APP_SECRET = ''
+    OAUTH_TOKEN = ''
+    OAUTH_TOKEN_SECRET = ''
  
- If you want to use sqlite, you don't have to do anything. **But with sqlite text filtering will be the register sensetive only.**
+ If you want to use sqlite, you don't have to do anything else. **But with sqlite text filtering will be the register sensetive only.**
  
  If you want to use mySQL, yot have to create table with right charset first:
  

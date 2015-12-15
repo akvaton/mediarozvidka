@@ -3,9 +3,7 @@
 
 {% block container %}
     <div class="row container">
-
         <div class="col-md-offset-1 col-md-11">
-
             <label> Фільтри</label>
             {% include 'app_news/filter.html' %}
             <hr>
@@ -13,7 +11,7 @@
                 <thead>
                     <th>Стаття</th>
                     <th>Дата публікації</th>
-                    {% if source = '0' %} <th>Джерело</th> {% endif %}
+                    {% if source == '0' %} <th>Джерело</th> {% endif %}
                     <th><img alt="FB shares" width="50px" src="{% static 'images/fb.jpg' %}"></th>
                 </thead>
             {% for article in object_list%}
@@ -22,7 +20,7 @@
                         {{ article.title }}</a>
                     </td>
                     <td>{{ article.datetime|date:"d-m-Y" }}</td>
-                    {% if source = '0' %} <td>{{ article.source_name }}</td> {% endif %}
+                    {% if source == '0' %} <td>{{ article.source_name }}</td> {% endif %}
                     <td>{{ article.shares_fb_total }}</td>
                 </tr>
             {% empty %}

@@ -1,22 +1,24 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
-import feedparser
+from datetime import datetime, timedelta
+from pytz import timezone
 import json
 import requests
 import re
 import urllib2
+
+import feedparser
 from twython import Twython
 from BeautifulSoup import BeautifulSoup
-from datetime import datetime, timedelta
-from pytz import timezone
 
-from models import ArticleModel, StatisticArticle, InternetTime
 from django.conf import settings
+from models import ArticleModel, StatisticArticle, InternetTime
 
 
-urls = {
+
+URLS = {
 'pravda': 'http://www.pravda.com.ua/rss/view_pubs/',
-'site_ua': ['https://site.ua/rss-all.xml','https://site.ua/rss.xml'],
+'site_ua': ['https://site.ua/rss-all.xml', 'https://site.ua/rss.xml'],
 'nyt': 'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
 }
 
@@ -33,12 +35,8 @@ def get_shares_fb_total(full_url):
     """
     Get fb shares for specific url
     """
-    try:
-        return json.loads(requests.get(
-            "http://graph.facebook.com/?id={}".format(full_url)).text
-                          )['shares']
-    except KeyError:
-        return 0
+    return json.loads(requests.get("http://graph.facebook.com/?id={}".
+                                   format(full_url)).text).get('shares', 0)
 
 
 def get_shares_vk_total(full_url):
@@ -83,7 +81,7 @@ def get_attendances(article):
             today_visit = td_tag.findNext('td')
             all_visits += int(today_visit.contents[0].replace(',', ''))
         return all_visits
-    except (urllib2.HTTPError, urllib2.URLError) as e:
+    except (urllib2.HTTPError, urllib2.URLError, AttributeError) as e:
         print e
     return 0
 
@@ -92,7 +90,7 @@ def get_pravda_articles():
     """
     Get rss feed from pravda.com.ua and get new articles from it
     """
-    rssfeed = feedparser.parse(urls['pravda'])
+    rssfeed = feedparser.parse(URLS['pravda'])
     internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
         if 'pravda.com.ua' in each['link']:
@@ -112,11 +110,11 @@ def get_site_ua_articles():
     """
     Get rss feed from site.ua and get new articles from it
     """
-    for rss_link in urls['site_ua']:
+    for rss_link in URLS['site_ua']:
         rssfeed = feedparser.parse(rss_link)
         internet_time = InternetTime.get_internet_time()
         for each in rssfeed.entries:
-            (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
+            article, cr = ArticleModel.objects.get_or_create(link=each['link'])
             if cr:
                 naive_date_str, _, offset_str = each['published'].rpartition(' ')
                 naive_dt = datetime.strptime(naive_date_str,
@@ -132,7 +130,7 @@ def get_nyt_articles():
     """
     Parse NYT site and new articles from it
     """
-    page = urllib2.urlopen(urls['nyt']).read()
+    page = urllib2.urlopen(URLS['nyt']).read()
     soup = BeautifulSoup(page)
     today = datetime.now()
     soup.prettify()
@@ -157,7 +155,7 @@ def check_articles_shares():
     Get all shares data for articles that were published less
     then 48 hours from now
     """
-    now_minus_48 = datetime.today()-timedelta(hours=48)
+    now_minus_48 = datetime.today() - timedelta(hours=48)
     internet_time = InternetTime.get_internet_time()
     active_articles = ArticleModel.objects.filter(datetime__gte=now_minus_48).\
                       order_by('datetime')
@@ -170,11 +168,8 @@ def check_articles_shares():
                         article=each,
                         shares_fb=shares_fb,
                         shares_twitter=shares_twitter,
-                        internet_time=internet_time - float(each.internet_time),
+                        internet_time=internet_time-float(each.internet_time),
                         shares_vk=shares_vk,
                         attendance=attendance
                                 )
         stat.save()
-
-
-

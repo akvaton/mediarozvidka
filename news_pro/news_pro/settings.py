@@ -8,8 +8,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-from __future__ import absolute_import
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -42,7 +40,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -76,17 +74,6 @@ ROOT_URLCONF = 'news_pro.urls'
 
 WSGI_APPLICATION = 'news_pro.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, "templates"),
 )
@@ -110,7 +97,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-from local_settings import *
+try:
+    from local_settings import *
+except ImportError:
+    print ('Local settings import error')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
