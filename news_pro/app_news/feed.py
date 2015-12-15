@@ -22,11 +22,17 @@ urls = {
 
 
 def daterange(start_date, end_date):
+    """
+    Return all dates in range from start_date to end_date
+    """
     for n in range(int((end_date - start_date).days)+1):
         yield start_date + timedelta(n)
 
 
 def get_shares_fb_total(full_url):
+    """
+    Get fb shares for specific url
+    """
     try:
         return json.loads(requests.get(
             "http://graph.facebook.com/?id={}".format(full_url)).text
@@ -36,6 +42,9 @@ def get_shares_fb_total(full_url):
 
 
 def get_shares_vk_total(full_url):
+    """
+    Get vk shares for specific url
+    """
     re_mask = '^VK.Share.count\([\d+], (\d+)\);$'
     rq_text = requests.get(
         "http://vk.com/share.php?act=count&url={}".format(full_url)
@@ -45,6 +54,9 @@ def get_shares_vk_total(full_url):
 
 
 def get_shares_twitter(full_url):
+    """
+    Get twitter shares for specific url
+    """
     twitter = Twython(settings.APP_KEY,
                       settings.APP_SECRET,
                       settings.OAUTH_TOKEN,
@@ -54,6 +66,9 @@ def get_shares_twitter(full_url):
 
 
 def get_attendances(article):
+    """
+    Get attendances for specific url
+    """
     try:
         moscow_time = datetime.now(timezone('Europe/Moscow')).date()
         all_visits = 0
@@ -68,12 +83,15 @@ def get_attendances(article):
             today_visit = td_tag.findNext('td')
             all_visits += int(today_visit.contents[0].replace(',', ''))
         return all_visits
-    except Exception as e:
+    except (urllib2.HTTPError, urllib2.URLError) as e:
         print e
     return 0
 
 
 def get_pravda_articles():
+    """
+    Get rss feed from pravda.com.ua and get new articles from it
+    """
     rssfeed = feedparser.parse(urls['pravda'])
     internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
@@ -91,6 +109,9 @@ def get_pravda_articles():
 
 
 def get_site_ua_articles():
+    """
+    Get rss feed from site.ua and get new articles from it
+    """
     for rss_link in urls['site_ua']:
         rssfeed = feedparser.parse(rss_link)
         internet_time = InternetTime.get_internet_time()
@@ -107,7 +128,35 @@ def get_site_ua_articles():
                 article.save()
 
 
+def get_nyt_articles():
+    """
+    Parse NYT site and new articles from it
+    """
+    page = urllib2.urlopen(urls['nyt']).read()
+    soup = BeautifulSoup(page)
+    today = datetime.now()
+    soup.prettify()
+    internet_time = InternetTime.get_internet_time()
+    searcn_div = soup.find('div', {"id": "searchList"})
+    for each in searcn_div.findAll('h4'):
+        link = each.find('a')['href']
+        title = each.find('a').text
+        time = datetime.strptime(each.findNext('h6').text, '%B %d, %Y, %A')
+        time = time.replace(hour=today.hour, minute=today.minute)
+        (article, cr) = ArticleModel.objects.get_or_create(link=link)
+        if cr:
+            article.title = title
+            article.datetime = time
+            article.source = 3
+            article.internet_time = internet_time
+            article.save()
+
+
 def check_articles_shares():
+    """
+    Get all shares data for articles that were published less
+    then 48 hours from now
+    """
     now_minus_48 = datetime.today()-timedelta(hours=48)
     internet_time = InternetTime.get_internet_time()
     active_articles = ArticleModel.objects.filter(datetime__gte=now_minus_48).\
@@ -128,22 +177,4 @@ def check_articles_shares():
         stat.save()
 
 
-def get_nyt_articles():
-    page = urllib2.urlopen(urls['nyt']).read()
-    soup = BeautifulSoup(page)
-    today = datetime.now()
-    soup.prettify()
-    internet_time = InternetTime.get_internet_time()
-    searcn_div = soup.find('div', {"id": "searchList"})
-    for each in searcn_div.findAll('h4'):
-        link = each.find('a')['href']
-        title = each.find('a').text
-        time = datetime.strptime(each.findNext('h6').text, '%B %d, %Y, %A')
-        time = time.replace(hour=today.hour, minute=today.minute)
-        (article, cr) = ArticleModel.objects.get_or_create(link=link)
-        if cr:
-            article.title = title
-            article.datetime = time
-            article.source = 3
-            article.internet_time = internet_time
-            article.save()
+

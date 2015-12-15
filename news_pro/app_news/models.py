@@ -20,6 +20,9 @@ from django.db.models import Sum, ObjectDoesNotExist
 
 
 def get_visits(date):
+    """
+    Get total count of visits from liveinternet, to get actual 'internet time'
+    """
     try:
         page = urllib2.urlopen('http://www.liveinternet.ru/stat/ua/media/index.html?lang=en&date=%s-%s-%s' %
                                (date.year, date.month, date.day)).read()
@@ -42,7 +45,7 @@ def get_visits(date):
             return int(visits_td.contents[0].replace(',', ''))
         else:
             return False
-    except Exception as e:
+    except (urllib2.HTTPError, urllib2.URLError) as e:
         print e
 
 
@@ -109,34 +112,26 @@ class ArticleModel(models.Model):
     @property
     def attendance(self):
         att = StatisticArticle.objects.filter(article=self).last()
-        if att:
-            return getattr(att, 'attendance')
-        else:
-            return 0
+        return getattr(att, 'attendance', 0)
+
 
     @property
     def shares_fb_total(self):
         fb = StatisticArticle.objects.filter(article=self).last()
-        if fb:
-            return getattr(fb, 'shares_fb')
-        else:
-            return 0
+        getattr(fb, 'shares_fb', 0)
+
 
     @property
     def shares_vk_total(self):
         vk = StatisticArticle.objects.filter(article=self).last()
-        if vk:
-            return getattr(vk, 'shares_vk')
-        else:
-            return 0
+        return getattr(vk, 'shares_vk', 0)
+
 
     @property
     def shares_twitter_total(self):
-        vk = StatisticArticle.objects.filter(article=self).last()
-        if vk:
-            return getattr(vk, 'shares_twitter')
-        else:
-            return 0
+        twitter = StatisticArticle.objects.filter(article=self).last()
+        return getattr(twitter, 'shares_twitter', 0)
+
 
     @property
     def source_name(self):

@@ -8,18 +8,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-# import djcelery
-# djcelery.setup_loader()
-
-# from  __future__ import absolute_import
-
-# CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
-
-# CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
-# CELERY_ALWAYS_EAGER = False
-#
-# CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
-
+from __future__ import absolute_import
 
 DATABASES = {
     'default': {
