@@ -13,6 +13,7 @@ def get_visits_count(date):
     """
     Get total count of visits from liveinternet, to get actual 'internet time'
     """
+    visits_count = 0
     try:
         page = urllib2.urlopen('http://www.liveinternet.ru/stat/ua/media/index.html?lang=en&date=%s-%s-%s' %
                                (date.year, date.month, date.day)).read()
@@ -33,11 +34,8 @@ def get_visits_count(date):
         # Check if date in args equal today date on site
         if date_for_visits.month == date.month and date_for_visits.day == date.day:
             visits_count = int(visits_td.contents[0].replace(',', ''))
-        else:
-            visits_count = 0
     except (urllib2.HTTPError, urllib2.URLError, AttributeError) as e:
         print e
-        visits_count = 0
     finally:
         return visits_count
 
