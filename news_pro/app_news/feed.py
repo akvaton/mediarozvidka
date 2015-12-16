@@ -7,12 +7,15 @@ import requests
 import re
 import urllib2
 
+import logging
 import feedparser
 from twython import Twython
 from BeautifulSoup import BeautifulSoup
 
 from django.conf import settings
 from models import ArticleModel, StatisticArticle, InternetTime, URLS
+
+logger = logging.getLogger('error')
 
 
 def daterange(start_date, end_date):
@@ -73,8 +76,8 @@ def get_attendances(article):
             today_visit = td_tag.findNext('td')
             all_visits += int(today_visit.contents[0].replace(',', ''))
         return all_visits
-    except (urllib2.HTTPError, urllib2.URLError, AttributeError) as e:
-        print e
+    except (urllib2.HTTPError, urllib2.URLError, AttributeError) as err:
+        logger.error(err)
     return 0
 
 
