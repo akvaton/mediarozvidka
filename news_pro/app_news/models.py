@@ -5,9 +5,17 @@ from BeautifulSoup import BeautifulSoup
 from datetime import datetime, timedelta
 from pytz import timezone
 
+import logging
 from django.db import models
 from django.db.models import Sum, ObjectDoesNotExist
 
+URLS = {
+'pravda': 'http://www.pravda.com.ua/rss/view_pubs/',
+'site_ua': ['https://site.ua/rss-all.xml', 'https://site.ua/rss.xml'],
+'nyt': 'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
+}
+
+logger = logging.getLogger('error')
 
 def get_visits_count(date):
     """
@@ -34,8 +42,8 @@ def get_visits_count(date):
         # Check if date in args equal today date on site
         if date_for_visits.month == date.month and date_for_visits.day == date.day:
             visits_count = int(visits_td.contents[0].replace(',', ''))
-    except (urllib2.HTTPError, urllib2.URLError, AttributeError) as e:
-        print e
+    except (urllib2.HTTPError, urllib2.URLError, AttributeError) as err:
+        logger.error(err)
     finally:
         return visits_count
 
@@ -49,13 +57,13 @@ class InternetTime(models.Model):
     date = models.DateField()
     visits = models.FloatField(default=.0)
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(self, *args, **kwargs):
         self.visits /= self.internet_minute
         super(InternetTime, self).save()
 
     @classmethod
     def get_internet_time(cls):
+        # We need the Moscow time because liveinternet.ru lives in Moscow TZ
         moscow_time = datetime.now(timezone('Europe/Moscow')).date()
         all_visits = InternetTime.objects.filter(date__lt=moscow_time).\
             aggregate(Sum('visits'))['visits__sum'] or .0
@@ -65,7 +73,6 @@ class InternetTime(models.Model):
                             date=moscow_time)
             stored_visits.visits = today_visits_count
             stored_visits.save()
-
             # Geting right count of yesterday visits if new day starts
             if cr:
                 try:
@@ -76,9 +83,9 @@ class InternetTime(models.Model):
                         yesterday_visits.visits = yesterday_visits_on_site
                         yesterday_visits.save()
                 except ObjectDoesNotExist:
-                    print "There is no yesterday visits in db"
+                    logger.error("There is no yesterday visits in db")
         else:
-            print 'Wrong day'
+            logger.error('Wrong day')
 
         return all_visits + float(today_visits_count) / cls.internet_minute
 

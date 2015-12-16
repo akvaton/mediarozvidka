@@ -11,7 +11,6 @@ from django.http import HttpResponse
 from models import ArticleModel, StatisticArticle
 from feed import (get_pravda_articles, get_site_ua_articles,
                   get_nyt_articles, check_articles_shares)
-# Create your views here.
 
 
 class Index(TemplateView):

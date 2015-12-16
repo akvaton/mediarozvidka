@@ -12,15 +12,7 @@ from twython import Twython
 from BeautifulSoup import BeautifulSoup
 
 from django.conf import settings
-from models import ArticleModel, StatisticArticle, InternetTime
-
-
-
-URLS = {
-'pravda': 'http://www.pravda.com.ua/rss/view_pubs/',
-'site_ua': ['https://site.ua/rss-all.xml', 'https://site.ua/rss.xml'],
-'nyt': 'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
-}
+from models import ArticleModel, StatisticArticle, InternetTime, URLS
 
 
 def daterange(start_date, end_date):
