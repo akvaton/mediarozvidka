@@ -58,7 +58,7 @@ class AllNews(ListView):
         if text_to_find:
             articles = articles.filter(title__icontains=text_to_find)
         # Order by facebook shares if needed
-        if order == '2':
+        if order == 'by_shares':
             articles = reversed(sorted(articles, key=lambda t: t.shares_fb_total))
 
         context['object_list'] = articles

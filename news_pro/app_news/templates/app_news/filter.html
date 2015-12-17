@@ -15,8 +15,8 @@
             </div>
             <div class="col-md-2">
                 <select name="order" class="c-select form-control">
-                    <option value="1" {% if order == '1' %} selected {% endif %}>Час</option>
-                    <option value="2" {% if order == '2' %} selected {% endif %}>Shares</option>
+                    <option value="by_time" {% if order == 'by_time' %} selected {% endif %}>Час</option>
+                    <option value="by_shares" {% if order == 'by_shares' %} selected {% endif %}>Shares</option>
                 </select>
             </div>
             <div class="col-md-2">
