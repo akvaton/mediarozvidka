@@ -46,6 +46,7 @@ class AllNews(ListView):
         # Filter by date range if needed
         if from_date and to_date:
             to_date = datetime.strptime(to_date,"%Y-%m-%d") + timedelta(days=1)
+            from_date = datetime.strptime(from_date,"%Y-%m-%d")
             articles = articles.filter(datetime__range=(from_date, to_date))
         # Filter by amount of all shares if needed
         if num_of_shares:

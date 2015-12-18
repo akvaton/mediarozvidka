@@ -116,7 +116,7 @@ class ArticleModel(models.Model):
     @property
     def shares_fb_total(self):
         fb = StatisticArticle.objects.filter(article=self).last()
-        getattr(fb, 'shares_fb', 0)
+        return getattr(fb, 'shares_fb', 0)
 
 
     @property
