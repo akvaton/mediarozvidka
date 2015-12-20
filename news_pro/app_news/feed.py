@@ -81,24 +81,29 @@ def get_attendances(article):
     return 0
 
 
-def get_pravda_articles():
-    """
-    Get rss feed from pravda.com.ua and get new articles from it
-    """
-    rssfeed = feedparser.parse(URLS['pravda'])
+def get_article_from_rss(rss_link, source):
+    rssfeed = feedparser.parse(rss_link)
     internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
         if 'pravda.com.ua' in each['link']:
-            (article, cr) = ArticleModel.objects.get_or_create(link=each['link'])
+            article, cr = ArticleModel.objects.get_or_create(link=each['link'])
             if cr:
                 naive_date_str = each['published'].rpartition(' ')[0]
                 naive_dt = datetime.strptime(naive_date_str,
                                              '%a, %d %b %Y %H:%M:%S')
                 article.title = each['title']
                 article.datetime = naive_dt
-                article.source = 1
+                article.source = source
                 article.internet_time = internet_time
                 article.save()
+
+
+def get_pravda_articles():
+    """
+    Get rss feed from pravda.com.ua and get new articles from it
+    """
+    for rss_link in URLS['pravda']:
+        get_article_from_rss(rss_link, 1)
 
 
 def get_site_ua_articles():
@@ -106,19 +111,7 @@ def get_site_ua_articles():
     Get rss feed from site.ua and get new articles from it
     """
     for rss_link in URLS['site_ua']:
-        rssfeed = feedparser.parse(rss_link)
-        internet_time = InternetTime.get_internet_time()
-        for each in rssfeed.entries:
-            article, cr = ArticleModel.objects.get_or_create(link=each['link'])
-            if cr:
-                naive_date_str, _, offset_str = each['published'].rpartition(' ')
-                naive_dt = datetime.strptime(naive_date_str,
-                                             '%a, %d %b %Y %H:%M:%S')
-                article.title = each['title']
-                article.datetime = naive_dt
-                article.source = 2
-                article.internet_time = internet_time
-                article.save()
+        get_article_from_rss(rss_link, 2)
 
 
 def get_nyt_articles():
@@ -153,7 +146,7 @@ def check_articles_shares():
     now_minus_48 = datetime.today() - timedelta(hours=48)
     internet_time = InternetTime.get_internet_time()
     active_articles = ArticleModel.objects.filter(datetime__gte=now_minus_48).\
-                      order_by('datetime')
+        order_by('datetime')
     for each in active_articles:
         shares_twitter = get_shares_twitter(each.link)
         shares_fb = get_shares_fb_total(each.link)

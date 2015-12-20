@@ -10,12 +10,13 @@ from django.db import models
 from django.db.models import Sum, ObjectDoesNotExist
 
 URLS = {
-'pravda': 'http://www.pravda.com.ua/rss/view_pubs/',
+'pravda': ['http://www.pravda.com.ua/rss/view_pubs/'],
 'site_ua': ['https://site.ua/rss-all.xml', 'https://site.ua/rss.xml'],
 'nyt': 'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
 }
 
 logger = logging.getLogger('error')
+
 
 def get_visits_count(date):
     """

@@ -1,12 +1,5 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
-"""
-    news_pro.app_news.admin
-    ~~~~~~~~~
-
-    :copyright: (c) 2015 by dorosh.
-"""
-
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
