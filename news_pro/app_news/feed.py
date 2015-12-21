@@ -31,7 +31,7 @@ def get_shares_fb_total(full_url):
     Get fb shares for specific url
     """
     return json.loads(requests.get("http://graph.facebook.com/?id={}".
-                                   format(full_url)).text).get('shares', 0)
+                                   format(unicode(full_url).encode('utf-8'))).text).get('shares', 0)
 
 
 def get_shares_vk_total(full_url):
@@ -40,7 +40,7 @@ def get_shares_vk_total(full_url):
     """
     re_mask = '^VK.Share.count\([\d+], (\d+)\);$'
     rq_text = requests.get(
-        "http://vk.com/share.php?act=count&url={}".format(full_url)
+        "http://vk.com/share.php?act=count&url={}".format(unicode(full_url).encode('utf-8'))
         ).text
     match = re.match(re_mask, rq_text)
     return int(match.groups()[0]) if match else 0
@@ -54,7 +54,7 @@ def get_shares_twitter(full_url):
                       settings.APP_SECRET,
                       settings.OAUTH_TOKEN,
                       settings.OAUTH_TOKEN_SECRET)
-    search = twitter.search(q=full_url)['statuses']
+    search = twitter.search(q=unicode(full_url).encode('utf-8'))['statuses']
     return len(search)
 
 
