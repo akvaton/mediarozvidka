@@ -10,7 +10,7 @@
         <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
         {% csrf_token %}
             <fieldset>
-                <legend>Ім'я пользователя та пароль</legend>
+                <legend>Ім'я користувача та пароль</legend>
                 {% for field in form %}
                     {{ field.label_tag }}
                     {{ field }}

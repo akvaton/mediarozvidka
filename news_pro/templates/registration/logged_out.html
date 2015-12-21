@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block container %}
+<div class="row">
+    <div class="col-md-offset-1">
+        <h2>До побачення</h2>
+        <a class="btn btn-primary" href="{% url 'auth:login' %}">
+                    Увійти знову
+                </a>
+    </div>
+</div>
+{% endblock %}
