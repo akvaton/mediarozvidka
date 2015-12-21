@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block container %}
+<div class="row">
+    <div class="col-md-offset-1">
+        {% if form.errors %}
+        <p>Невірний логін або пароль, спробуйте ще раз.</p>
+        {% endif %}
+
+        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+        {% csrf_token %}
+            <fieldset>
+                <legend>Ім'я пользователя та пароль</legend>
+                {% for field in form %}
+                    {{ field.label_tag }}
+                    {{ field }}
+                {% endfor %}
+                <button type="submit" class="btn btn-primary clearfix">Увійти</button>
+            </fieldset>
+        <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+    </div>
+</div>
+{% endblock %}
+

@@ -3,6 +3,7 @@ from BeautifulSoup import BeautifulSoup
 from mock import patch
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 from django.conf import settings
 from feed import *
@@ -67,6 +68,8 @@ class ViewsTest(TestCase):
         ArticleModel.objects.create(title='To find', link='test', source=1)
         fb = ArticleModel.objects.create(title='fb_test', link='test', source=1)
         StatisticArticle.objects.create(article=fb, shares_fb=201)
+        User.objects.create_user('test', 'test@test.com', 'test')
+        self.client.login(username='test', password='test')
 
     def test_filter_dates(self):
         response = self.client.get(reverse('news:all'), {'from':'1940-12-12','to':'1960-12-12'})

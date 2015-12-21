@@ -81,7 +81,7 @@ def get_attendances(article):
     return 0
 
 
-def get_article_from_rss(rss_link, source):
+def get_article_from_pravda(rss_link, source):
     rssfeed = feedparser.parse(rss_link)
     internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
@@ -103,7 +103,9 @@ def get_pravda_articles():
     Get rss feed from pravda.com.ua and get new articles from it
     """
     for rss_link in URLS['pravda']:
-        get_article_from_rss(rss_link, 1)
+        get_article_from_pravda(rss_link, 1)
+    for rss_link in URLS['pravda_news']:
+        get_article_from_pravda(rss_link, 4)
 
 
 def get_site_ua_articles():
@@ -111,7 +113,19 @@ def get_site_ua_articles():
     Get rss feed from site.ua and get new articles from it
     """
     for rss_link in URLS['site_ua']:
-        get_article_from_rss(rss_link, 2)
+        rssfeed = feedparser.parse(rss_link)
+        internet_time = InternetTime.get_internet_time()
+        for each in rssfeed.entries:
+            article, cr = ArticleModel.objects.get_or_create(link=each['link'])
+            if cr:
+                naive_date_str = each['published'].rpartition(' ')[0]
+                naive_dt = datetime.strptime(naive_date_str,
+                                             '%a, %d %b %Y %H:%M:%S')
+                article.title = each['title']
+                article.datetime = naive_dt
+                article.source = 2
+                article.internet_time = internet_time
+                article.save()
 
 
 def get_nyt_articles():

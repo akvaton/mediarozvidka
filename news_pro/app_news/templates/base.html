@@ -27,8 +27,13 @@
             <a href="/all/1">Pravda.com.ua</a></li>
             {% if source = '2' %} <li class="active"> {% else %} <li> {% endif %}
             <a href="/all/2">Site.ua</a></li>
+            {% if source = '4' %} <li class="active"> {% else %} <li> {% endif %}
+            <a href="/all/4">Pravda News</a></li>
             {% if source = '3' %} <li class="active"> {% else %} <li> {% endif %}
             <a href="/all/3">New Your Times</a></li>
+            <li>
+                <a class="btn btn-warning" href="{% url 'auth:logout' %}">Виход</a>
+            </li>
           </ul>
         </div>
     </nav>

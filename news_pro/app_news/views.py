@@ -12,8 +12,10 @@ from models import ArticleModel, StatisticArticle
 from feed import (get_pravda_articles, get_site_ua_articles,
                   get_nyt_articles, check_articles_shares)
 
+from base import AuthRequiredMixin
 
-class Index(TemplateView):
+
+class Index(AuthRequiredMixin, TemplateView):
 
     template_name = 'index.html'
 
@@ -24,7 +26,7 @@ class Index(TemplateView):
         return context
 
 
-class AllNews(ListView):
+class AllNews(AuthRequiredMixin, ListView):
     model = ArticleModel
 
     def get_context_data(self, **kwargs):
@@ -66,7 +68,7 @@ class AllNews(ListView):
         return context
 
 
-class OneNews(DetailView):
+class OneNews(AuthRequiredMixin, DetailView):
     model = ArticleModel
 
     def get_context_data(self, **kwargs):
@@ -77,7 +79,7 @@ class OneNews(DetailView):
         return context
 
 
-class SourceChoice(TemplateView):
+class SourceChoice(AuthRequiredMixin, TemplateView):
     template_name = 'app_news/choice.html'
 
 

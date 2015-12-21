@@ -12,6 +12,7 @@ from django.db.models import Sum, ObjectDoesNotExist
 URLS = {
 'pravda': ['http://www.pravda.com.ua/rss/view_pubs/'],
 'site_ua': ['https://site.ua/rss-all.xml', 'https://site.ua/rss.xml'],
+'pravda_news':['http://www.pravda.com.ua/rss/view_news/'],
 'nyt': 'http://topics.nytimes.com/top/news/international/countriesandterritories/ukraine/index.html?inline=nyt-geo'
 }
 
@@ -98,9 +99,10 @@ class ArticleModel(models.Model):
     """
     Model for agregate article from news source.
     """
-    SOURCE_TYPE_OPTIONS = ((1, 'Pravda.com.ua'),
+    SOURCE_TYPE_OPTIONS = ((1, 'Pravda article'),
                            (2, 'Site.ua'),
-                           (3, 'NewYork times'))
+                           (3, 'NewYork times'),
+                           (4, 'Pravda news'))
 
     title = models.CharField(max_length=160, blank=True, null=True)
     link = models.URLField(max_length=160, blank=True, null=True)
