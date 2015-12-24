@@ -11,6 +11,7 @@ import logging
 import feedparser
 from twython import Twython, TwythonRateLimitError
 from BeautifulSoup import BeautifulSoup
+from requests import ConnectionError
 
 from django.conf import settings
 from models import ArticleModel, StatisticArticle, InternetTime, URLS
@@ -167,7 +168,10 @@ def check_articles_shares():
         except TwythonRateLimitError:
             shares_twitter = 0
         shares_fb = get_shares_fb_total(each.link)
-        shares_vk = get_shares_vk_total(each.link)
+        try:
+            shares_vk = get_shares_vk_total(each.link)
+        except ConnectionError:
+            shares_vk = 0
         attendance = get_attendances(each) if each.source in [1, 4] else None
         stat = StatisticArticle(
                         article=each,
