@@ -165,7 +165,7 @@ def check_articles_shares():
         try:
             shares_twitter = get_shares_twitter(each.link)
         except TwythonRateLimitError:
-            shares_twitter = None
+            shares_twitter = 0
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
         attendance = get_attendances(each) if each.source in [1, 4] else None
