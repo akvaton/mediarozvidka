@@ -9,7 +9,7 @@ import urllib2
 
 import logging
 import feedparser
-from twython import Twython
+from twython import Twython, TwythonRateLimitError
 from BeautifulSoup import BeautifulSoup
 
 from django.conf import settings
@@ -162,7 +162,10 @@ def check_articles_shares():
     active_articles = ArticleModel.objects.filter(datetime__gte=now_minus_48).\
         order_by('datetime')
     for each in active_articles:
-        shares_twitter = get_shares_twitter(each.link)
+        try:
+            shares_twitter = get_shares_twitter(each.link)
+        except TwythonRateLimitError:
+            shares_twitter = None
         shares_fb = get_shares_fb_total(each.link)
         shares_vk = get_shares_vk_total(each.link)
         attendance = get_attendances(each) if each.source in [1, 4] else None
