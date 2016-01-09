@@ -111,7 +111,7 @@ def save_to_excel(request):
     style_string = "font: bold on; borders: bottom double"
     style = xlwt.easyxf(style_string)
 
-    column_names = ['Час запросу', 'Shares FB',	'Shares VK', 'Shares Twitter'
+    column_names = ['Час запросу', 'Shares FB',	'Shares VK', 'Shares Twitter',
                     'Attendance',	'Internet час']
     for i in range(len(column_names)):
         sheet.write(1, i, column_names[i], style)
