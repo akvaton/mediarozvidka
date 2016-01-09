@@ -120,10 +120,10 @@ def save_to_excel(request):
         sheet.write(i, 0, each.datetime.strftime("%d-%m-%y %H:%M"))
         sheet.write(i, 1, each.shares_fb)
         sheet.write(i, 2, each.shares_vk)
-        sheet.write(i, 3, each.attendance)
-        sheet.write(i, 4, each.internet_time)
+        sheet.write(i, 3, each.shares_twitter)
+        sheet.write(i, 4, each.attendance)
+        sheet.write(i, 5, each.internet_time)
         i += 1
-
     a = StringIO.StringIO()
     book.save(a)
     response = HttpResponse(content_type='text/plain')
