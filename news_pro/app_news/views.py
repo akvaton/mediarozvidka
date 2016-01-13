@@ -3,6 +3,7 @@
 import xlwt
 import StringIO
 from datetime import timedelta, datetime
+from pytz import timezone
 
 from django.views.generic import ListView, DetailView, TemplateView
 from django.shortcuts import redirect
@@ -117,7 +118,7 @@ def save_to_excel(request):
         sheet.write(1, i, column_names[i], style)
     i = 2
     for each in statistics:
-        sheet.write(i, 0, each.datetime.strftime("%d-%m-%y %H:%M"))
+        sheet.write(i, 0, each.datetime.astimezone(timezone('Europe/Athens')).strftime("%d-%m-%y %H:%M"))
         sheet.write(i, 1, each.shares_fb)
         sheet.write(i, 2, each.shares_vk)
         sheet.write(i, 3, each.shares_twitter)
