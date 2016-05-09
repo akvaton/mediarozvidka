@@ -43,8 +43,6 @@ def get_visits_count(date):
 
         # Check if date in args equal today date on site
         if date_for_visits.month == date.month and date_for_visits.day == date.day:
-            logger.error(date_for_visits)
-            logger.error(visits_td.contents)
             visits_count = int(visits_td.contents[0].replace(',', ''))
     except (urllib2.HTTPError, urllib2.URLError, AttributeError) as err:
         logger.error(err)
@@ -72,6 +70,7 @@ class InternetTime(models.Model):
         all_visits = InternetTime.objects.filter(date__lt=moscow_time).\
             aggregate(Sum('visits'))['visits__sum'] or .0
         today_visits_count = get_visits_count(moscow_time)
+        logger.error(today_visits_count)
         if today_visits_count > 0:
             (stored_visits, cr) = InternetTime.objects.get_or_create(
                             date=moscow_time)
