@@ -31,8 +31,9 @@ def get_shares_fb_total(full_url):
     """
     Get fb shares for specific url
     """
-    return json.loads(requests.get("http://graph.facebook.com/?id={}".
-                                   format(unicode(full_url).encode('utf-8'))).text).get('shares', 0)
+    return json.loads(requests.get(
+        "https://api.facebook.com/method/links.getStats?urls=={}&format=json".
+        format(unicode(full_url).encode('utf-8'))).text).get('share_count', 0)
 
 
 def get_shares_vk_total(full_url):
@@ -87,7 +88,13 @@ def get_article_from_pravda(rss_link, source):
     internet_time = InternetTime.get_internet_time()
     for each in rssfeed.entries:
         if 'pravda.com.ua' in each['link']:
-            article, cr = ArticleModel.objects.get_or_create(link=each['link'])
+            try:
+                article, cr = ArticleModel.objects.get_or_create(link=each['link'])
+            except Exception:
+                all_articles = ArticleModel.objects.filter(link=each['link'])
+                article = all_articles[0]
+                cr = False
+                map(lambda x: x.delete(), all_articles[1:])
             if cr:
                 naive_date_str = each['published'].rpartition(' ')[0]
                 naive_dt = datetime.strptime(naive_date_str,
