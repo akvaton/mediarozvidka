@@ -70,7 +70,6 @@ class InternetTime(models.Model):
         all_visits = InternetTime.objects.filter(date__lt=moscow_time).\
             aggregate(Sum('visits'))['visits__sum'] or .0
         today_visits_count = get_visits_count(moscow_time)
-        logger.error(today_visits_count)
         if today_visits_count > 0:
             (stored_visits, cr) = InternetTime.objects.get_or_create(
                             date=moscow_time)

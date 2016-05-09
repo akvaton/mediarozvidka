@@ -33,7 +33,7 @@ def get_shares_fb_total(full_url):
     """
     return json.loads(requests.get(
         "https://api.facebook.com/method/links.getStats?urls=={}&format=json".
-        format(unicode(full_url).encode('utf-8'))).text).get('share_count', 0)
+        format(unicode(full_url).encode('utf-8'))).text)[0].get('share_count', 0)
 
 
 def get_shares_vk_total(full_url):
