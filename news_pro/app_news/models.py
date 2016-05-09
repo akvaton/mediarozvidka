@@ -87,7 +87,7 @@ class InternetTime(models.Model):
                 except ObjectDoesNotExist:
                     logger.error("There is no yesterday visits in db")
         else:
-            logger.error('Wrong day')
+            logger.error('Wrong day %s' % str(moscow_time))
 
         return all_visits + float(today_visits_count) / cls.internet_minute
 
