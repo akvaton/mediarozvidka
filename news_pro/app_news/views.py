@@ -112,7 +112,8 @@ def save_to_excel(request):
     style_string = "font: bold on; borders: bottom double"
     style = xlwt.easyxf(style_string)
 
-    column_names = ['Час запросу', 'Shares FB',	'Shares VK', 'Shares Twitter',
+    column_names = ['Час запросу', 'Shares FB',	'FB total',
+                    'Shares VK', 'Shares Twitter',
                     'Attendance',	'Internet час']
     for i in range(len(column_names)):
         sheet.write(1, i, column_names[i], style)
@@ -120,10 +121,11 @@ def save_to_excel(request):
     for each in statistics:
         sheet.write(i, 0, each.datetime.astimezone(timezone('Europe/Athens')).strftime("%d-%m-%y %H:%M"))
         sheet.write(i, 1, each.shares_fb)
-        sheet.write(i, 2, each.shares_vk)
-        sheet.write(i, 3, each.shares_twitter)
-        sheet.write(i, 4, each.attendance)
-        sheet.write(i, 5, each.internet_time)
+        sheet.write(i, 2, each.fb_total)
+        sheet.write(i, 3, each.shares_vk)
+        sheet.write(i, 4, each.shares_twitter)
+        sheet.write(i, 5, each.attendance)
+        sheet.write(i, 6, each.internet_time)
         i += 1
     a = StringIO.StringIO()
     book.save(a)
@@ -132,3 +134,10 @@ def save_to_excel(request):
     response.write(a.getvalue())
     a.close()
     return response
+
+
+def check(request):
+    now_minus_hour = datetime.today() - timedelta(hours=1)
+    last_statics_time = StatisticArticle.objects.filter(datetime__gte=now_minus_hour).exists()
+    return HttpResponse(last_statics_time)
+

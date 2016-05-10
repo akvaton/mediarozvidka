@@ -9,7 +9,6 @@ from django.conf import settings
 from feed import *
 from models import *
 
-# Create your tests here.
 
 class FeedTest(TestCase):
     def setUp(self):

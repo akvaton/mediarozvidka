@@ -157,6 +157,9 @@ class StatisticArticle(models.Model):
     shares_fb = models.PositiveIntegerField(
         u'Поширюваність новини у цей час у FB', default=0
     )
+    fb_total = models.PositiveIntegerField(
+        u'Загальне поширювання новини у цей час у FB', default=0
+    )
     shares_vk = models.PositiveIntegerField(
         u'Поширюваність новини у цей час у VK', default=0
     )

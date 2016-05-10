@@ -8,7 +8,8 @@
     <table class="table">
         <thead>
             <th>Час запросу</th>
-            <th><img alt="FB shares" width="50px" src="{% static 'images/fb.jpg' %}"></th>
+            <th>Shares<br><img alt="FB shares" width="50px" src="{% static 'images/fb.jpg' %}"></th>
+            <th>Total<br><img alt="FB total" width="50px" src="{% static 'images/fb.jpg' %}"></th>
             <th><img alt="VK shares" width="50px" src="{% static 'images/vk.jpg' %}"></th>
             <th><img alt="Tweet shares" width="50px" src="{% static 'images/tweet.jpg' %}"></th>
             <th>Відвідування</th>
@@ -19,6 +20,7 @@
             <tr>
                 <td>{{ share.datetime|date:"d-m-Y H:i" }}</td>
                 <td>{{ share.shares_fb}}</td>
+                <td>{{ share.fb_total}}</td>
                 <td>{{ share.shares_vk}}</td>
                 <td>{{ share.shares_twitter}}</td>
                 <td>{{ share.attendance}}</td>

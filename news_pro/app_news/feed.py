@@ -31,9 +31,10 @@ def get_shares_fb_total(full_url):
     """
     Get fb shares for specific url
     """
-    return json.loads(requests.get(
+    fb = json.loads(requests.get(
         "https://api.facebook.com/method/links.getStats?urls=={}&format=json".
-        format(unicode(full_url).encode('utf-8'))).text)[0].get('share_count', 0)
+        format(unicode(full_url).encode('utf-8'))).text)[0]
+    return fb.get('share_count', 0), fb.get('total_count', 0)
 
 
 def get_shares_vk_total(full_url):
@@ -146,18 +147,19 @@ def get_nyt_articles():
     soup.prettify()
     internet_time = InternetTime.get_internet_time()
     searcn_div = soup.find('div', {"id": "searchList"})
-    for each in searcn_div.findAll('h4'):
-        link = each.find('a')['href']
-        title = each.find('a').text
-        time = datetime.strptime(each.findNext('h6').text, '%B %d, %Y, %A')
-        time = time.replace(hour=today.hour, minute=today.minute)
-        (article, cr) = ArticleModel.objects.get_or_create(link=link)
-        if cr:
-            article.title = title
-            article.datetime = time
-            article.source = 3
-            article.internet_time = internet_time
-            article.save()
+    if searcn_div:
+        for each in searcn_div.findAll('h4'):
+            link = each.find('a')['href']
+            title = each.find('a').text
+            time = datetime.strptime(each.findNext('h6').text, '%B %d, %Y, %A')
+            time = time.replace(hour=today.hour, minute=today.minute)
+            (article, cr) = ArticleModel.objects.get_or_create(link=link)
+            if cr:
+                article.title = title
+                article.datetime = time
+                article.source = 3
+                article.internet_time = internet_time
+                article.save()
 
 
 def check_articles_shares():
@@ -174,7 +176,7 @@ def check_articles_shares():
             shares_twitter = get_shares_twitter(each.link)
         except TwythonRateLimitError:
             shares_twitter = 0
-        shares_fb = get_shares_fb_total(each.link)
+        (shares_fb, fb_total) = get_shares_fb_total(each.link)
         try:
             shares_vk = get_shares_vk_total(each.link)
         except ConnectionError:
@@ -183,6 +185,7 @@ def check_articles_shares():
         stat = StatisticArticle(
                         article=each,
                         shares_fb=shares_fb,
+                        fb_total=fb_total,
                         shares_twitter=shares_twitter,
                         internet_time=internet_time-float(each.internet_time),
                         shares_vk=shares_vk,
