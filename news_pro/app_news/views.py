@@ -74,6 +74,8 @@ class AllNews(AuthRequiredMixin, ListView):
         result = prog.findall(current_url)
         for each in result:
             current_url = current_url.replace(each, '')
+        if not '?' in current_url:
+            current_url += '?'
         context['pages'] = len(articles) / 50
         if page < 1: page = 1
         if page > context['pages'] + 1: page = context['pages'] + 1  
