@@ -134,10 +134,3 @@ def save_to_excel(request):
     response.write(a.getvalue())
     a.close()
     return response
-
-
-def check(request):
-    now_minus_hour = datetime.today() - timedelta(hours=1)
-    last_statics_time = StatisticArticle.objects.filter(datetime__gte=now_minus_hour).exists()
-    return HttpResponse(last_statics_time)
-
