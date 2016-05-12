@@ -3,4 +3,5 @@
 .idea/
 *.sqlite3
 news_pro/news_pro/local_settings.py
+news_pro/log/*.log
 celerybeat-schedule.db
