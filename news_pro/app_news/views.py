@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import xlwt
 import StringIO
+import re
 from datetime import timedelta, datetime
 from pytz import timezone
 
@@ -36,6 +37,7 @@ class AllNews(AuthRequiredMixin, ListView):
         text_to_find = self.request.GET.get('find')
         num_of_shares = self.request.GET.get('shares')
         order = self.request.GET.get('order')
+        page = int(self.request.GET.get('page', 1))
         context = super(AllNews, self).get_context_data(**kwargs)
         if 'source' in self.kwargs:
             source = self.kwargs['source']
@@ -61,11 +63,25 @@ class AllNews(AuthRequiredMixin, ListView):
         # Filter by text in title if needed
         if text_to_find:
             articles = articles.filter(title__icontains=text_to_find)
+       
         # Order by facebook shares if needed
         if order == 'by_shares':
-            articles = reversed(sorted(articles, key=lambda t: t.shares_fb_total))
-
-        context['object_list'] = articles
+            articles = list(reversed(sorted(articles, key=lambda t: t.shares_fb_total)))
+        
+        # pagination
+        current_url = self.request.build_absolute_uri() 
+        prog = re.compile('&page=\d+')
+        result = prog.findall(current_url)
+        for each in result:
+            current_url = current_url.replace(each, '')
+        context['pages'] = len(articles) / 50
+        if page < 1: page = 1
+        if page > context['pages'] + 1: page = context['pages'] + 1  
+        context['object_list'] = articles[(page-1)*50:page*50]
+        context['previous_page_url'] = current_url + '&page=%d' % (page-1) if page > 1 else False
+        context['current_page'] = page
+        context['next_page_url'] = current_url + '&page=%d' % (page+1) if context['pages'] + 1 > page else False
+        
         return context
 
 

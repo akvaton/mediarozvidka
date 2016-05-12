@@ -2,3 +2,9 @@
     display: table-cell;
     vertical-align: middle;
 }
+
+.pagination li a {
+    width:40px;
+    max-width:40px;
+    text-align: center;
+}

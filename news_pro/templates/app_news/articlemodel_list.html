@@ -27,6 +27,15 @@
                 <li>No articles yet.</li>
             {% endfor %}
             </table>
+            {% if pages > 0 %}
+            <div class="text-center">
+                <ul class="pagination" id="pages">
+                    {% if previous_page_url %} <li><a href="{{ previous_page_url }}">Previous</a></li> {% endif %}
+                    <li class="disabled"><a href="#">{{ current_page }}</a></li>
+                    {% if next_page_url %}<li><a href="{{ next_page_url }}">Next</a></li> {% endif %}
+                </ul>
+            </div>
+            {% endif %}
         </div>
     </div>
 {% endblock container %}
