@@ -16,7 +16,7 @@ class Command(NoArgsCommand):
         last_statistics_time = StatisticArticle.objects.filter(datetime__gte=now_minus_hour).exists()
         if not last_statistics_time:
             recipient_list = ['ilya.batozskiy@raccoongang.com',
-                              'employer.email']
+                              'artem.zakh@gmail.com']
             subject, from_email = 'Some problems on News Server', 'no-reply@news.com'
             last_working_time = StatisticArticle.objects.all().order_by('datetime').\
                                                  last().datetime.replace(tzinfo=None)
