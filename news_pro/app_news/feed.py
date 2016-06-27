@@ -14,6 +14,7 @@ from BeautifulSoup import BeautifulSoup
 from requests import ConnectionError
 
 from django.conf import settings
+from django.core.exceptions import MultipleObjectsReturned
 from models import ArticleModel, StatisticArticle, InternetTime, URLS
 
 logger = logging.getLogger('error')
@@ -91,7 +92,7 @@ def get_article_from_pravda(rss_link, source):
         if 'pravda.com.ua' in each['link']:
             try:
                 article, cr = ArticleModel.objects.get_or_create(link=each['link'])
-            except Exception:
+            except MultipleObjectsReturned:
                 all_articles = ArticleModel.objects.filter(link=each['link'])
                 article = all_articles[0]
                 cr = False
@@ -125,7 +126,13 @@ def get_site_ua_articles():
         rssfeed = feedparser.parse(rss_link)
         internet_time = InternetTime.get_internet_time()
         for each in rssfeed.entries:
-            article, cr = ArticleModel.objects.get_or_create(link=each['link'])
+            try:
+                article, cr = ArticleModel.objects.get_or_create(link=each['link'])
+            except MultipleObjectsReturned:
+                all_articles = ArticleModel.objects.filter(link=each['link'])
+                article = all_articles[0]
+                cr = False
+                map(lambda x: x.delete(), all_articles[1:])
             if cr:
                 naive_date_str = each['published'].rpartition(' ')[0]
                 naive_dt = datetime.strptime(naive_date_str,
