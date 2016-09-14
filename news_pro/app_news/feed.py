@@ -34,32 +34,22 @@ def get_shares_fb_total(full_url):
     """
     Get fb shares for specific url
     """
-
-    # fb_request = requests.get("https://graph.facebook.com/?id={}&access_token={}"
-    #                           .format(unicode(full_url).encode('utf-8'), settings.FACEBOOK_ACCESS_TOKEN))#, verify=False)
-    # if fb_request.status_code == 200:
-    #     fb = fb_request.json()['share']['share_count']
-    #     print full_url
-    #     print fb
-    #     return fb
-    # else:
-    #     return 0
-
-    fb = json.loads(requests.get("https://graph.facebook.com/?id={}&access_token={}".
-                                   format(unicode(full_url).encode('utf-8'), settings.FACEBOOK_ACCESS_TOKEN)).text)#['share']['share_count']
-    print full_url
-    print (fb['share']['share_count'])
-    return (fb['share']['share_count'])
-
-
-
-    # http = urllib3.PoolManager()
-    # fb = http.request('GET', 'https://graph.facebook.com/?id={}&access_token={}'.
-    #                                format(unicode(full_url).encode('utf-8'), settings.FACEBOOK_ACCESS_TOKEN))#['share']['share_count']
-    # print fb
-    # # print (fb['share']['share_count'])
-    # # return (fb['share']['share_count'])
-    # return 0
+    result = 0
+    try:
+        fb_request = requests.get(
+            "https://graph.facebook.com/?id={}&access_token={}"
+            .format(unicode(full_url).encode('utf-8'), settings.FACEBOOK_ACCESS_TOKEN)
+        )
+    except ConnectionError as e:
+        # TODO add logging
+        print(e)
+    else:
+        if fb_request.status_code == 200:
+            fb = fb_request.json().get('share')
+            if fb:
+                result = fb.get('share_count', 0)
+    finally:
+        return result
 
 
 def get_shares_vk_total(full_url):
