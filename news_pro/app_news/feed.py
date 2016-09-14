@@ -207,11 +207,7 @@ def check_articles_shares():
             shares_twitter = get_shares_twitter(each.link)
         except TwythonRateLimitError:
             shares_twitter = 0
-        try:
-            shares_fb = get_shares_fb_total(each.link)
-        except KeyError:
-            shares_fb = 0
-        #(shares_fb, fb_total) = get_shares_fb_total(each.link)
+        shares_fb = get_shares_fb_total(each.link)
         try:
             shares_vk = get_shares_vk_total(each.link)
         except ConnectionError:
@@ -220,7 +216,6 @@ def check_articles_shares():
         stat = StatisticArticle(
                         article=each,
                         shares_fb=shares_fb,
-                        #fb_total=fb_total,
                         shares_twitter=shares_twitter,
                         internet_time=internet_time-float(each.internet_time),
                         shares_vk=shares_vk,
