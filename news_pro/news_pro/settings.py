@@ -131,8 +131,15 @@ LOGGING = {
 LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/all'
 
+TWITTER_APP_KEY = ''
+TWITTER_APP_SECRET = ''
+TWITTER_OAUTH_TOKEN = ''
+TWITTER_OAUTH_TOKEN_SECRET = ''
+
+FACEBOOK_ACCESS_TOKEN = ''
+
 try:
     from local_settings import *
 except ImportError:
     print ('Local settings import error')
-    
+

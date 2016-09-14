@@ -16,6 +16,8 @@ from requests import ConnectionError
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from models import ArticleModel, StatisticArticle, InternetTime, URLS
+from urllib3.contrib import pyopenssl
+pyopenssl.inject_into_urllib3()
 
 logger = logging.getLogger('error')
 
@@ -32,10 +34,32 @@ def get_shares_fb_total(full_url):
     """
     Get fb shares for specific url
     """
-    fb = json.loads(requests.get(
-        "https://api.facebook.com/method/links.getStats?urls=={}&format=json".
-        format(unicode(full_url).encode('utf-8'))).text)[0]
-    return fb.get('share_count', 0), fb.get('total_count', 0)
+
+    # fb_request = requests.get("https://graph.facebook.com/?id={}&access_token={}"
+    #                           .format(unicode(full_url).encode('utf-8'), settings.FACEBOOK_ACCESS_TOKEN))#, verify=False)
+    # if fb_request.status_code == 200:
+    #     fb = fb_request.json()['share']['share_count']
+    #     print full_url
+    #     print fb
+    #     return fb
+    # else:
+    #     return 0
+
+    fb = json.loads(requests.get("https://graph.facebook.com/?id={}&access_token={}".
+                                   format(unicode(full_url).encode('utf-8'), settings.FACEBOOK_ACCESS_TOKEN)).text)#['share']['share_count']
+    print full_url
+    print (fb['share']['share_count'])
+    return (fb['share']['share_count'])
+
+
+
+    # http = urllib3.PoolManager()
+    # fb = http.request('GET', 'https://graph.facebook.com/?id={}&access_token={}'.
+    #                                format(unicode(full_url).encode('utf-8'), settings.FACEBOOK_ACCESS_TOKEN))#['share']['share_count']
+    # print fb
+    # # print (fb['share']['share_count'])
+    # # return (fb['share']['share_count'])
+    # return 0
 
 
 def get_shares_vk_total(full_url):
@@ -54,10 +78,10 @@ def get_shares_twitter(full_url):
     """
     Get twitter shares for specific url
     """
-    twitter = Twython(settings.APP_KEY,
-                      settings.APP_SECRET,
-                      settings.OAUTH_TOKEN,
-                      settings.OAUTH_TOKEN_SECRET)
+    twitter = Twython(settings.TWITTER_APP_KEY,
+                      settings.TWITTER_APP_SECRET,
+                      settings.TWITTER_OAUTH_TOKEN,
+                      settings.TWITTER_OAUTH_TOKEN_SECRET)
     search = twitter.search(q=unicode(full_url).encode('utf-8'))['statuses']
     return len(search)
 
@@ -183,7 +207,11 @@ def check_articles_shares():
             shares_twitter = get_shares_twitter(each.link)
         except TwythonRateLimitError:
             shares_twitter = 0
-        (shares_fb, fb_total) = get_shares_fb_total(each.link)
+        try:
+            shares_fb = get_shares_fb_total(each.link)
+        except KeyError:
+            shares_fb = 0
+        #(shares_fb, fb_total) = get_shares_fb_total(each.link)
         try:
             shares_vk = get_shares_vk_total(each.link)
         except ConnectionError:
@@ -192,7 +220,7 @@ def check_articles_shares():
         stat = StatisticArticle(
                         article=each,
                         shares_fb=shares_fb,
-                        fb_total=fb_total,
+                        #fb_total=fb_total,
                         shares_twitter=shares_twitter,
                         internet_time=internet_time-float(each.internet_time),
                         shares_vk=shares_vk,
