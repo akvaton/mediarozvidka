@@ -136,7 +136,8 @@ class ArticleModel(models.Model):
 
     @property
     def source_name(self):
-        return dict(self.SOURCE_TYPE_OPTIONS)[self.source]
+        if self.source:
+            return dict(self.SOURCE_TYPE_OPTIONS)[self.source]
 
     def __unicode__(self):
         return self.title or u''
