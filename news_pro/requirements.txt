@@ -1,4 +1,4 @@
-Django==1.7.4
+Django==1.11.28
 BeautifulSoup==3.2.1
 amqp==1.4.7
 anyjson==0.3.3
